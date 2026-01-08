@@ -499,7 +499,6 @@ const TransitCard: React.FC<{
                  <input type="time" className="w-full border border-slate-300 bg-white p-2 text-[10px] rounded text-slate-900" value={transit.arrivalTime || ''} onChange={e => onEdit(transit.id, 'arrivalTime', e.target.value)} onKeyDown={handleKeyDown} />
               </div>
             </div>
-            <input className="w-full border border-slate-300 bg-white p-2 text-[10px] rounded text-slate-900" value={transit.confirmationCode || ''} onChange={e => onEdit(transit.id, 'confirmationCode', e.target.value)} placeholder="Conf. Code" onKeyDown={handleKeyDown} />
             <div className="text-center text-[9px] text-slate-400 italic">Press Enter to save</div>
           </div>
         ) : (
