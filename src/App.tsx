@@ -752,21 +752,6 @@ const App: React.FC = () => {
     setActiveTripId(newTrips.length > 0 ? newTrips[0].id : null);
   }
 };
-    
-    const newTrips = trips.filter(t => t.id !== tripId);
-    setTrips(newTrips);
-    
-    const key = 'triphub_db_trips';
-    const stored = localStorage.getItem(key);
-    if (stored) {
-       const rows = JSON.parse(stored).filter((r:any) => r.id !== tripId);
-       localStorage.setItem(key, JSON.stringify(rows));
-    }
-    
-    if (activeTripId === tripId) {
-        setActiveTripId(newTrips.length > 0 ? newTrips[0].id : null);
-    }
-  };
 
   const handleEditLocal = useCallback((itemId: string, field: string, value: any) => {
     if (!activeTripId) return;
