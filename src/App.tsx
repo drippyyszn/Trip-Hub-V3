@@ -731,7 +731,7 @@ const App: React.FC = () => {
     setActiveModal(null);
   };
   
-  const handleDeleteTrip = async (e: React.MouseEvent, tripId: string) => {
+   const handleDeleteTrip = async (e: React.MouseEvent, tripId: string) => {
   e.stopPropagation();
 
   // 1) Delete from Supabase (real source of truth)
