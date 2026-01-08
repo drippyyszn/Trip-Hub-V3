@@ -437,6 +437,33 @@ const TransitCard: React.FC<{
   const [isEditing, setIsEditing] = useState(false);
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter') setIsEditing(false); };
 
+  // ADD THIS: Calculate duration
+  const duration = useMemo(() => {
+    if (!transit.departureDate || !transit.departureTime || !transit.arrivalDate || !transit.arrivalTime) {
+      return null;
+    }
+    
+    try {
+      const depDateTime = new Date(`${transit.departureDate}T${transit.departureTime}`);
+      const arrDateTime = new Date(`${transit.arrivalDate}T${transit.arrivalTime}`);
+      
+      const diffMs = arrDateTime.getTime() - depDateTime.getTime();
+      const diffMins = Math.floor(diffMs / (1000 * 60));
+      
+      if (diffMins <= 0) return null;
+      
+      const hours = Math.floor(diffMins / 60);
+      const mins = diffMins % 60;
+      
+      return `${hours}h ${mins}m`;
+    } catch {
+      return null;
+    }
+  }, [transit.departureDate, transit.departureTime, transit.arrivalDate, transit.arrivalTime]);
+
+  const fromLoc = transit.from || 'TBD';
+  const toLoc = transit.to || 'TBD';
+
   // Fallback rendering
   const fromLoc = transit.from || 'TBD';
   const toLoc = transit.to || 'TBD';
@@ -492,6 +519,13 @@ const TransitCard: React.FC<{
              <p className="text-[10px] font-bold">{formatDateDisplay(transit.arrivalDate)} {formatTime12h(transit.arrivalTime)}</p>
           </div>
         </div>
+        {duration && (
+          <div className="flex justify-center mt-2">
+            <p className="text-[9px] font-bold text-slate-500 flex items-center gap-1">
+              <Clock className="w-2.5 h-2.5"/> {duration}
+            </p>
+          </div>
+        )}
         <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-50">
            <button onClick={() => onEdit(transit.id, 'isBooked', !transit.isBooked)} className={`text-[8px] font-black uppercase px-3 py-1.5 rounded-xl border transition-all ${transit.isBooked ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
              {transit.isBooked ? 'Booked' : 'Unbooked'}
