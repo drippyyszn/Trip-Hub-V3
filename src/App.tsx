@@ -461,9 +461,6 @@ const TransitCard: React.FC<{
     }
   }, [transit.departureDate, transit.departureTime, transit.arrivalDate, transit.arrivalTime]);
 
-  const fromLoc = transit.from || 'TBD';
-  const toLoc = transit.to || 'TBD';
-
   // Fallback rendering
   const fromLoc = transit.from || 'TBD';
   const toLoc = transit.to || 'TBD';
