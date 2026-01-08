@@ -731,8 +731,27 @@ const App: React.FC = () => {
     setActiveModal(null);
   };
   
-  const handleDeleteTrip = (e: React.MouseEvent, tripId: string) => {
-    e.stopPropagation();
+  const handleDeleteTrip = async (e: React.MouseEvent, tripId: string) => {
+  e.stopPropagation();
+
+  // 1) Delete from Supabase (real source of truth)
+  const { error } = await supabase.from('trips').delete().eq('id', tripId);
+
+  if (error) {
+    console.error('Supabase delete failed:', error.message);
+    alert("Couldn't delete trip: " + error.message);
+    return;
+  }
+
+  // 2) Remove from UI
+  const newTrips = trips.filter(t => t.id !== tripId);
+  setTrips(newTrips);
+
+  // 3) Fix active trip if you deleted it
+  if (activeTripId === tripId) {
+    setActiveTripId(newTrips.length > 0 ? newTrips[0].id : null);
+  }
+};
     
     const newTrips = trips.filter(t => t.id !== tripId);
     setTrips(newTrips);
