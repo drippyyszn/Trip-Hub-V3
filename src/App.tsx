@@ -399,22 +399,24 @@ const StayCard: React.FC<{
           </>
         )}
         <div className="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4 relative">
-          {nights > 0 && (
-             <div className="absolute top-4 left-1/2 -translate-x-1/2 -translate-y-1/2">
-               <div className="bg-slate-50 border border-slate-200 text-slate-400 text-[8px] font-black uppercase px-2 py-0.5 rounded-full shadow-sm">
-                 {nights} Night{nights !== 1 ? 's' : ''}
-               </div>
-             </div>
-          )}
-          <div>
-            <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Check-in</p>
-            <p className="text-[10px] font-bold text-slate-800">{formatDateDisplay(stay.checkInDate)} {formatTime12h(stay.checkInTime)}</p>
-          </div>
-          <div className="text-right">
-            <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Check-out</p>
-            <p className="text-[10px] font-bold text-slate-800">{formatDateDisplay(stay.checkOutDate)} {formatTime12h(stay.checkOutTime)}</p>
-          </div>
-        </div>
+  {nights > 0 && (
+     <div className="absolute top-4 left-1/2 -translate-x-1/2 -translate-y-1/2">
+       <div className="bg-slate-50 border border-slate-200 text-slate-400 text-[8px] font-black uppercase px-2 py-0.5 rounded-full shadow-sm">
+         {nights} Night{nights !== 1 ? 's' : ''}
+       </div>
+     </div>
+  )}
+  <div>
+    <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Check-in</p>
+    <p className="text-[10px] font-bold text-slate-500">{formatDateDisplay(stay.checkInDate)}</p>
+    <p className="text-[10px] font-bold text-slate-900">{formatTime12h(stay.checkInTime)}</p>
+  </div>
+  <div className="text-right">
+    <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Check-out</p>
+    <p className="text-[10px] font-bold text-slate-500">{formatDateDisplay(stay.checkOutDate)}</p>
+    <p className="text-[10px] font-bold text-slate-900">{formatTime12h(stay.checkOutTime)}</p>
+  </div>
+</div>
         <div className="mt-3 flex gap-3 text-[9px] font-bold text-slate-400 uppercase items-center">
           <button onClick={() => onEdit(stay.id, 'isBooked', !stay.isBooked)} className={`px-2 py-0.5 rounded border transition-colors ${stay.isBooked ? 'text-emerald-600 border-emerald-200 bg-emerald-50' : 'text-slate-400 border-slate-200'}`}>
              {stay.isBooked ? 'BOOKED' : 'UNBOOKED'}
@@ -509,11 +511,13 @@ const TransitCard: React.FC<{
         <div className="grid grid-cols-2 gap-4 border-t border-slate-50 pt-4">
           <div>
             <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Departure</p>
-            <p className="text-[10px] font-bold">{formatDateDisplay(transit.departureDate)} {formatTime12h(transit.departureTime)}</p>
+            <p className="text-[10px] font-bold text-slate-500">{formatDateDisplay(transit.departureDate)}</p>
+            <p className="text-[10px] font-bold text-slate-900">{formatTime12h(transit.departureTime)}</p>
           </div>
           <div className="text-right">
              <p className="text-[8px] font-black text-slate-400 uppercase mb-1">Arrival</p>
-             <p className="text-[10px] font-bold">{formatDateDisplay(transit.arrivalDate)} {formatTime12h(transit.arrivalTime)}</p>
+             <p className="text-[10px] font-bold text-slate-500">{formatDateDisplay(transit.arrivalDate)}</p>
+             <p className="text-[10px] font-bold text-slate-900">{formatTime12h(transit.arrivalTime)}</p>
           </div>
         </div>
         {duration && (
