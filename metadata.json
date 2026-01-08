@@ -1,0 +1,7 @@
+{
+  "name": "TripHub",
+  "description": "The all-in-one vacation planner and group trip tracker with advanced expense splitting and multi-traveler coordination.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
