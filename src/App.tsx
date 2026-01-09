@@ -515,7 +515,6 @@ const TransitCard: React.FC<{
             
             <div className="text-center text-[9px] text-slate-400 italic">Press Enter to save</div>
           </div>
-            <div className="text-center text-[9px] text-slate-400 italic">Press Enter to save</div>
           </div>
         ) : (
           <>
