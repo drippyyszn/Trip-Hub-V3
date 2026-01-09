@@ -200,28 +200,30 @@ const FlightCard: React.FC<{
          const mins = durationMins % 60;
          durationDisplay = `~${hours}h ${mins}m`;
 
-         const [h, m] = depTime.split(':').map(Number);
-         const originOffsetMins = AIRPORT_OFFSETS[from] * 60;
-         const utcDepMins = (h * 60 + m) - originOffsetMins;
-         const utcArrMins = utcDepMins + durationMins;
-         const destOffsetMins = AIRPORT_OFFSETS[to] * 60;
-         const localArrMinsTotal = utcArrMins + destOffsetMins;
-         
-         let localArrMins = localArrMinsTotal;
-         let dayOffset = 0;
-         while (localArrMins >= 1440) { localArrMins -= 1440; dayOffset++; }
-         while (localArrMins < 0) { localArrMins += 1440; dayOffset--; }
+         // Only calculate if user hasn't manually set arrival time
+         if (!flight.arrivalTime || flight.arrivalTime === '14:00') {
+           const [h, m] = depTime.split(':').map(Number);
+           const originOffsetMins = AIRPORT_OFFSETS[from] * 60;
+           const utcDepMins = (h * 60 + m) - originOffsetMins;
+           const utcArrMins = utcDepMins + durationMins;
+           const destOffsetMins = AIRPORT_OFFSETS[to] * 60;
+           const localArrMinsTotal = utcArrMins + destOffsetMins;
+           
+           let localArrMins = localArrMinsTotal;
+           let dayOffset = 0;
+           while (localArrMins >= 1440) { localArrMins -= 1440; dayOffset++; }
+           while (localArrMins < 0) { localArrMins += 1440; dayOffset--; }
 
-         const arrH = Math.floor(localArrMins / 60);
-         const arrM = localArrMins % 60;
-         const ampm = arrH >= 12 ? 'PM' : 'AM';
-         const h12 = arrH % 12 || 12;
-         arrivalTimeDisplay = `${h12}:${arrM.toString().padStart(2, '0')} ${ampm}${dayOffset > 0 ? ` (+${dayOffset}d)` : ''}`;
-         
+           const arrH = Math.floor(localArrMins / 60);
+           const arrM = localArrMins % 60;
+           const ampm = arrH >= 12 ? 'PM' : 'AM';
+           const h12 = arrH % 12 || 12;
+           arrivalTimeDisplay = `${h12}:${arrM.toString().padStart(2, '0')} ${ampm}${dayOffset > 0 ? ` (+${dayOffset}d)` : ''}`;
+         }
       }
     }
     return { arrivalTimeDisplay, durationDisplay };
-  }, [flight, onEdit]);
+  }, [flight]);
 
   const originCity = flight.departureCity || "TBD";
  const originCode = flight.departureAirport || "TBD";
