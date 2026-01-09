@@ -26,7 +26,6 @@ export interface Accommodation {
   nights?: number;
   guests?: string;
   roomType?: string;
-  confirmationCode?: string;
   cost?: number;
   currency?: string;
   bookingUrl?: string;
