@@ -79,7 +79,7 @@ const FLIGHT_ESTIMATES: Record<string, number> = {
   'YUL-FCO': 495, 'FCO-YUL': 525, // Rome (Fiumicino)
   'YUL-MXP': 480, 'MXP-YUL': 510, // Milan (Malpensa)
   'YUL-VCE': 495, 'VCE-YUL': 525, // Venice
-  'YUL-ATH': 540, 'ATH-YUL': 606, // Athens
+  'YUL-ATH': 540, 'ATH-YUL': 610, // Athens
   'YUL-EDI': 360, 'EDI-YUL': 385, // Edinburgh
   'YUL-GLA': 360, 'GLA-YUL': 385, // Glasgow
   'YUL-MAN': 375, 'MAN-YUL': 400, // Manchester
