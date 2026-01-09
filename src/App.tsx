@@ -1413,7 +1413,31 @@ const App: React.FC = () => {
             </div>
           </div>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center bg-white p-10 text-center animate-in fade-in zoom-in-95">
+          ) : (
+  <div className="flex-1 flex flex-col bg-white">
+    {/* Mobile header with hamburger menu */}
+    <div className="lg:hidden p-4 border-b border-slate-100 flex items-center justify-between">
+      <h1 className="text-xl font-black italic tracking-tighter flex items-center gap-2 text-sky-600">
+        <Compass className="w-6 h-6" /> TripHub
+      </h1>
+      <button
+        onClick={() => setShowSidebar(true)}
+        className="p-2 rounded-xl bg-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-600"
+      >
+        <LayoutGrid className="w-5 h-5" />
+      </button>
+    </div>
+    
+    {/* Empty state content */}
+    <div className="flex-1 flex flex-col items-center justify-center p-10 text-center animate-in fade-in zoom-in-95">
+      <div className="w-32 h-32 bg-sky-50 rounded-full flex items-center justify-center mb-8"><Compass className="w-16 h-16 text-sky-500 opacity-40 animate-pulse" /></div>
+      <h2 className="text-3xl font-black italic text-slate-900 uppercase tracking-tighter mb-4">No Trip Selected</h2>
+      <p className="text-slate-400 max-w-sm mb-12 text-sm font-medium leading-relaxed">Select a trip from the sidebar or create a new one to get started.</p>
+      <button onClick={() => setActiveModal('trip')} className="px-12 py-5 bg-sky-600 text-white rounded-[2.5rem] font-black uppercase tracking-widest shadow-2xl hover:bg-sky-700 hover:scale-105 active:scale-95 transition-all flex items-center gap-4">
+        <Plus className="w-6 h-6" /> Create New Trip
+      </button>
+    </div>
+  </div>
             <div className="w-32 h-32 bg-sky-50 rounded-full flex items-center justify-center mb-8"><Compass className="w-16 h-16 text-sky-500 opacity-40 animate-pulse" /></div>
             <h2 className="text-3xl font-black italic text-slate-900 uppercase tracking-tighter mb-4">No Trip Selected</h2>
             <p className="text-slate-400 max-w-sm mb-12 text-sm font-medium leading-relaxed">Select a trip from the sidebar or create a new one to get started.</p>
