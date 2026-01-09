@@ -58,7 +58,7 @@ const ADD_TEMPLATES = [
 const AIRPORT_OFFSETS: Record<string, number> = {
   YUL: -4, JFK: -4, YYZ: -4, BOS: -4,
   CDG: 2, LHR: 1, AMS: 2, FRA: 2,
-  HND: 9, NRT: 9, ATH: 10,
+  HND: 9, NRT: 9, ATH: 3,
   LAX: -7, SFO: -7, YVR: -7
 };
 
