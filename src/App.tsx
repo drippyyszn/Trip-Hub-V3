@@ -499,11 +499,32 @@ const TransitCard: React.FC<{
                  <input type="time" className="w-full border border-slate-300 bg-white p-2 text-[10px] rounded text-slate-900" value={transit.arrivalTime || ''} onChange={e => onEdit(transit.id, 'arrivalTime', e.target.value)} onKeyDown={handleKeyDown} />
               </div>
             </div>
+            {/* ADD THIS: Price field */}
+            <div className="space-y-1">
+              <label className="text-[8px] font-black uppercase text-slate-400">Price ({currencySymbol})</label>
+              <input 
+                type="number" 
+                step="0.01" 
+                className="w-full border border-slate-300 bg-white p-2 text-[10px] rounded text-slate-900" 
+                value={transit.cost || ''} 
+                onChange={e => onEdit(transit.id, 'cost', parseFloat(e.target.value) || 0)} 
+                onKeyDown={handleKeyDown} 
+                placeholder="0.00"
+              />
+            </div>
+            
+            <div className="text-center text-[9px] text-slate-400 italic">Press Enter to save</div>
+          </div>
             <div className="text-center text-[9px] text-slate-400 italic">Press Enter to save</div>
           </div>
         ) : (
           <>
-            <h4 className="text-xl font-black text-slate-900 mb-1 uppercase tracking-tighter">{transit.operator || transit.type}</h4>
+            <div className="flex justify-between items-start mb-1">
+              <h4 className="text-xl font-black text-slate-900 uppercase tracking-tighter">{transit.operator || transit.type}</h4>
+              {transit.cost !== undefined && transit.cost > 0 && (
+                <span className="text-xs font-black text-emerald-600">{currencySymbol}{transit.cost.toFixed(2)}</span>
+              )}
+            </div>
             <p className="text-[9px] font-bold text-slate-400 uppercase mb-4">{fromLoc} → {toLoc}</p>
           </>
         )}
