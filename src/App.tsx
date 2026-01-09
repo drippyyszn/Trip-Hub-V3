@@ -1103,10 +1103,34 @@ const App: React.FC = () => {
     if (!activeTrip) return [];
     const timeline: any[] = [];
     (activeTrip.flights || []).forEach(f => {
-       const origin = f.departureAirport || f.departureCity || 'TBD';
-       const dest = f.arrivalAirport || f.arrivalCity || 'TBD';
-       timeline.push({ id: f.id, date: f.departureDate || '', title: `Flight: ${origin} → ${dest}`, type: 'flight', details: `${f.airline || 'Flight'} | ${f.flightNumber || 'TBD'}`, time: f.departureTime, category: 'travel' });
+  const origin = f.departureAirport || f.departureCity || 'TBD';
+  const dest = f.arrivalAirport || f.arrivalCity || 'TBD';
+  const details = `${f.airline || 'Flight'} | ${f.flightNumber || 'TBD'}`;
+
+  // Departure event
+  timeline.push({
+    id: `${f.id}-dep`,
+    date: f.departureDate || '',
+    title: `Flight: ${origin} → ${dest}`,
+    type: 'flight',
+    details,
+    time: f.departureTime,
+    category: 'travel'
+  });
+
+  // Landing / arrival event
+  if (f.arrivalDate || f.arrivalTime) {
+    timeline.push({
+      id: `${f.id}-arr`,
+      date: f.arrivalDate || f.departureDate || '',
+      title: `Landing: ${dest}`,
+      type: 'flight',
+      details,
+      time: f.arrivalTime,
+      category: 'travel'
     });
+  }
+});
     (activeTrip.accommodations || []).forEach(a => {
       if (a.checkInDate) timeline.push({ id: (a.id as string) + '-in', date: a.checkInDate, title: `Check-in: ${a.name}`, type: 'stay', details: a.address, time: a.checkInTime || '15:00', category: 'rest' });
       if (a.checkOutDate) timeline.push({ id: (a.id as string) + '-out', date: a.checkOutDate, title: `Check-out: ${a.name}`, type: 'stay', details: a.address, time: a.checkOutTime || '11:00', category: 'rest' });
