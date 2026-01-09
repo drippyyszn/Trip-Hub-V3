@@ -73,6 +73,8 @@ export interface Transit {
   departureTime: string;
   arrivalDate?: string;
   arrivalTime?: string;
+  cost?: number;           // ADD THIS
+  currency?: string;       // ADD THIS
   confirmationCode?: string;
   url?: string;
   notes?: string;
