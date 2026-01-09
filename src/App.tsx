@@ -1148,7 +1148,7 @@ const App: React.FC = () => {
                   <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/20 custom-scrollbar">
                     {(activeTrip.messages || []).map(msg => (<div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}><div className={`max-w-[90%] rounded-[2rem] p-4 text-xs font-semibold shadow-sm ${msg.role === 'user' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-100 text-slate-700'}`}>{msg.content}</div></div>))}
                   </div>
-                  <div className="p-4 md:p-6 border-t border-slate-100 bg-white sticky bottom-0 z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+                  <div className="p-3 md:p-6 border-t border-slate-100 bg-white sticky bottom-0 z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                     <div className="mb-4">
                       <button 
                         onClick={() => setShowExamples(!showExamples)}
