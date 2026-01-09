@@ -218,20 +218,6 @@ const FlightCard: React.FC<{
          const h12 = arrH % 12 || 12;
          arrivalTimeDisplay = `${h12}:${arrM.toString().padStart(2, '0')} ${ampm}${dayOffset > 0 ? ` (+${dayOffset}d)` : ''}`;
          
-         // Update arrival date if day offset exists
-         if (dayOffset > 0 && flight.departureDate) {
-           const depDate = new Date(flight.departureDate + 'T12:00:00');
-           depDate.setDate(depDate.getDate() + dayOffset);
-           const newArrivalDate = depDate.toISOString().split('T')[0];
-           if (flight.arrivalDate !== newArrivalDate) {
-             // Trigger update to fix the arrival date
-             setTimeout(() => {
-               if (typeof onEdit === 'function') {
-                 onEdit(flight.id, 'arrivalDate', newArrivalDate);
-               }
-             }, 0);
-           }
-         }
       }
     }
     return { arrivalTimeDisplay, durationDisplay };
