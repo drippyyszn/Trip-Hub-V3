@@ -729,6 +729,7 @@ const App: React.FC = () => {
   const [transitFilter, setTransitFilter] = useState<'all' | 'ferry' | 'train' | 'bus'>('all');
   const [showExamples, setShowExamples] = useState(false);
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   const activeTrip = useMemo(() => trips.find(t => t.id === activeTripId) || null, [trips, activeTripId]);
   const currencySymbol = useMemo(() => CURRENCIES.find(c => c.code === (activeTrip?.preferredCurrency || 'CAD'))?.symbol || '$', [activeTrip]);
@@ -1081,12 +1082,34 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col md:flex-row md:h-screen bg-[#FDFDFD] md:overflow-hidden min-h-screen text-slate-900 antialiased font-['Inter']">
-      <aside className="w-80 bg-white border-r border-slate-100 flex flex-col hidden lg:flex shadow-sm z-50">
-        <div className="p-8"><h1 className="text-3xl font-black italic tracking-tighter flex items-center gap-2 text-sky-600"><Compass className="w-8 h-8" /> TripHub</h1></div>
+      <aside
+  className={`bg-white border-r border-slate-100 flex flex-col shadow-sm z-50
+  ${showSidebar ? 'fixed inset-0 w-full h-full flex' : 'hidden'}
+  lg:static lg:inset-auto lg:w-80 lg:h-auto lg:flex`}
+>
+        <div className="p-8 flex items-center justify-between">
+  <h1 className="text-3xl font-black italic tracking-tighter flex items-center gap-2 text-sky-600">
+    <Compass className="w-8 h-8" /> TripHub
+  </h1>
+
+  {/* Mobile close */}
+  <button
+    onClick={() => setShowSidebar(false)}
+    className="lg:hidden p-2 rounded-xl bg-slate-100 text-slate-600"
+  >
+    <X className="w-5 h-5" />
+  </button>
+</div>
         <div className="flex-1 overflow-y-auto px-6 space-y-2 custom-scrollbar">
           <div className="flex justify-between items-center mb-4"><h2 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Trips</h2><button onClick={(e) => { e.stopPropagation(); handleCreateTrip("New Trip"); }} className="p-2 bg-slate-900 text-white rounded-lg hover:scale-105 active:scale-95 transition-all"><Plus className="w-4 h-4" /></button></div>
           {trips.map(trip => (
-            <div key={trip.id} onClick={() => setActiveTripId(trip.id)} className={`p-4 rounded-2xl cursor-pointer border transition-all flex items-center justify-between group ${activeTripId === trip.id ? 'bg-white border-sky-100 shadow-xl text-sky-600' : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-400'}`}>
+            <div
+  key={trip.id}
+  onClick={() => {
+    setActiveTripId(trip.id);
+    setShowSidebar(false);
+  }}
+  className={`p-4 rounded-2xl cursor-pointer border transition-all flex items-center justify-between group ${activeTripId === trip.id ? 'bg-white border-sky-100 shadow-xl text-sky-600' : 'bg-transparent border-transparent hover:bg-slate-50 text-slate-400'}`}>
               <div className="flex items-center gap-3 overflow-hidden">
                 <MapPin className="w-4 h-4 shrink-0" /> 
                 <span className="font-black text-xs uppercase max-w-[180px] truncate block">{trip.name}</span>
@@ -1108,6 +1131,12 @@ const App: React.FC = () => {
        onClick={() => setIsChatCollapsed(!isChatCollapsed)}
        className="md:hidden p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-all shrink-0"
      >
+       <button
+  onClick={() => setShowSidebar(true)}
+  className="lg:hidden p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-all shrink-0"
+>
+  <LayoutGrid className="w-4 h-4" />
+</button>
        <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${isChatCollapsed ? 'rotate-90' : '-rotate-90'}`} />
      </button>
      <h2 className="text-lg font-black uppercase italic truncate flex-1 -mr-2">{activeTrip.name}</h2>
