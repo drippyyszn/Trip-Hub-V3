@@ -1124,7 +1124,7 @@ const App: React.FC = () => {
       <main className="flex-1 flex flex-col md:overflow-hidden min-h-0">
         {activeTrip ? (
           <div className="flex-1 flex flex-col md:flex-row md:overflow-hidden">
-            <div className={`w-full md:w-[400px] ${isChatCollapsed ? 'h-auto' : 'h-[40vh]'} md:h-full shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-slate-50 bg-white shadow-sm z-40 sticky top-0 md:static transition-[height] duration-300 ease-in-out`}>
+            <div className={`w-full md:w-[400px] ${isChatCollapsed ? 'h-auto' : 'h-[60dvh]'} md:h-full shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-slate-50 bg-white shadow-sm z-40 sticky top-0 md:static transition-[height] duration-300 ease-in-out pb-24 md:pb-0`}>
               <div className="p-4 md:p-6 border-b border-slate-50 flex items-center justify-between bg-white relative z-50">
   <div className="flex items-center gap-3 flex-1 min-w-0">
      <button 
@@ -1148,7 +1148,7 @@ const App: React.FC = () => {
                   <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/20 custom-scrollbar">
                     {(activeTrip.messages || []).map(msg => (<div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}><div className={`max-w-[90%] rounded-[2rem] p-4 text-xs font-semibold shadow-sm ${msg.role === 'user' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-100 text-slate-700'}`}>{msg.content}</div></div>))}
                   </div>
-                  <div className="p-6 border-t border-slate-100 bg-white">
+                  <div className="p-4 md:p-6 border-t border-slate-100 bg-white sticky bottom-0 z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                     <div className="mb-4">
                       <button 
                         onClick={() => setShowExamples(!showExamples)}
@@ -1415,8 +1415,8 @@ const App: React.FC = () => {
         ) : (
           <div className="flex-1 flex flex-col items-center justify-center bg-white p-10 text-center animate-in fade-in zoom-in-95">
             <div className="w-32 h-32 bg-sky-50 rounded-full flex items-center justify-center mb-8"><Compass className="w-16 h-16 text-sky-500 opacity-40 animate-pulse" /></div>
-            <h2 className="text-3xl font-black italic text-slate-900 uppercase tracking-tighter mb-4">Your Next Adventure Awaits</h2>
-            <p className="text-slate-400 max-w-sm mb-12 text-sm font-medium leading-relaxed">Start planning your dream vacation. Organize flights, hotels, and split expenses with friends seamlessly.</p>
+            <h2 className="text-3xl font-black italic text-slate-900 uppercase tracking-tighter mb-4">No Trip Selected</h2>
+            <p className="text-slate-400 max-w-sm mb-12 text-sm font-medium leading-relaxed">Select a trip from the sidebar or create a new one to get started.</p>
             <button onClick={() => setActiveModal('trip')} className="px-12 py-5 bg-sky-600 text-white rounded-[2.5rem] font-black uppercase tracking-widest shadow-2xl hover:bg-sky-700 hover:scale-105 active:scale-95 transition-all flex items-center gap-4">
               <Plus className="w-6 h-6" /> Create New Trip
             </button>
