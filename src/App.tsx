@@ -803,7 +803,7 @@ const App: React.FC = () => {
    const handleDeleteTrip = async (e: React.MouseEvent, tripId: string) => {
   e.stopPropagation();
 
-     const trip = trips.find(t => t.id === tripId);
+   const trip = trips.find(t => t.id === tripId);
   if (!window.confirm(`Delete "${trip?.name || 'this trip'}" permanently? This cannot be undone.`)) {
     return;
   }
