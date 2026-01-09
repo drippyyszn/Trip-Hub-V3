@@ -515,7 +515,6 @@ const TransitCard: React.FC<{
             
             <div className="text-center text-[9px] text-slate-400 italic">Press Enter to save</div>
           </div>
-          </div>
         ) : (
           <>
             <div className="flex justify-between items-start mb-1">
