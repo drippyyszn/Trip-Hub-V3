@@ -880,6 +880,17 @@ const App: React.FC = () => {
     return `✓ Processing your request...`;
   };
 
+  const handleClearChat = () => {
+  if (!activeTripId) return;
+  if (window.confirm('Clear all chat messages? This cannot be undone.')) {
+    setTrips(prev => prev.map(t => 
+      t.id === activeTripId 
+        ? { ...t, messages: [], lastUpdated: Date.now() } 
+        : t
+    ));
+  }
+};
+  
   const handleSendMessage = async (customInput?: string) => {
   const text = customInput || inputText;
   if (!text.trim() || !activeTrip) return;
@@ -1128,21 +1139,32 @@ const App: React.FC = () => {
               <div className="p-4 md:p-6 border-b border-slate-50 flex items-center justify-between bg-white relative z-50">
   <div className="flex items-center gap-3 flex-1 min-w-0">
      <button 
+       onClick={() => setShowSidebar(true)}
+       className="lg:hidden p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-all shrink-0"
+     >
+       <LayoutGrid className="w-4 h-4" />
+     </button>
+     <button 
        onClick={() => setIsChatCollapsed(!isChatCollapsed)}
        className="md:hidden p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-all shrink-0"
      >
-       <button
-  onClick={() => setShowSidebar(true)}
-  className="lg:hidden p-1.5 rounded-lg bg-slate-50 text-slate-400 hover:text-sky-600 hover:bg-sky-50 transition-all shrink-0"
->
-  <LayoutGrid className="w-4 h-4" />
-</button>
        <ChevronRight className={`w-4 h-4 transition-transform duration-300 ${isChatCollapsed ? 'rotate-90' : '-rotate-90'}`} />
      </button>
-     <h2 className="text-lg font-black uppercase italic truncate flex-1 -mr-2">{activeTrip.name}</h2>
+     <h2 className="text-lg font-black uppercase italic truncate flex-1">{activeTrip.name}</h2>
   </div>
-                <button onClick={() => setActiveModal('trip')} className="text-slate-300 hover:text-slate-900 transition-colors"><Edit2 className="w-4 h-4" /></button>
-              </div>
+  <div className="flex items-center gap-2">
+    {activeTrip.messages && activeTrip.messages.length > 0 && (
+      <button 
+        onClick={handleClearChat} 
+        className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
+        title="Clear chat"
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    )}
+    <button onClick={() => setActiveModal('trip')} className="text-slate-300 hover:text-slate-900 transition-colors"><Edit2 className="w-4 h-4" /></button>
+  </div>
+</div>
               
               <div className={`flex-col flex-1 overflow-hidden ${isChatCollapsed ? 'hidden md:flex' : 'flex'}`}>
                   <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/20 custom-scrollbar">
