@@ -98,6 +98,33 @@ const formatTime12h = (timeStr?: string) => {
   } catch { return timeStr; }
 };
 
+const formatTimestamp = (timestamp: number) => {
+  const date = new Date(timestamp);
+  
+  // Format in EST (America/New_York)
+  const timeStr = date.toLocaleTimeString('en-US', {
+    timeZone: 'America/New_York',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  
+  const today = new Date();
+  const isToday = date.toDateString() === today.toDateString();
+  
+  if (isToday) {
+    return timeStr; // Just "2:34 PM"
+  } else {
+    // Show date too if not today: "Jan 8, 2:34 PM"
+    const dateStr = date.toLocaleDateString('en-US', {
+      timeZone: 'America/New_York',
+      month: 'short',
+      day: 'numeric'
+    });
+    return `${dateStr}, ${timeStr}`;
+  }
+};
+
 const formatDateDisplay = (dateStr?: string) => {
   if (!dateStr || dateStr === 'TBD' || dateStr === '') return '—';
   try {
@@ -1168,8 +1195,17 @@ const App: React.FC = () => {
               
               <div className={`flex-col flex-1 overflow-hidden ${isChatCollapsed ? 'hidden md:flex' : 'flex'}`}>
                   <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/20 custom-scrollbar">
-                    {(activeTrip.messages || []).map(msg => (<div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}><div className={`max-w-[90%] rounded-[2rem] p-4 text-xs font-semibold shadow-sm ${msg.role === 'user' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-100 text-slate-700'}`}>{msg.content}</div></div>))}
-                  </div>
+  {(activeTrip.messages || []).map(msg => (
+    <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start'} animate-in fade-in slide-in-from-bottom-2`}>
+      <div className={`max-w-[90%] rounded-[2rem] p-4 text-xs font-semibold shadow-sm ${msg.role === 'user' ? 'bg-slate-900 text-white' : 'bg-white border border-slate-100 text-slate-700'}`}>
+        {msg.content}
+      </div>
+      <span className={`text-[9px] font-medium mt-1 px-2 ${msg.role === 'user' ? 'text-slate-400' : 'text-slate-400'}`}>
+        {formatTimestamp(msg.timestamp)}
+      </span>
+    </div>
+  ))}
+</div>
                   <div className="p-3 md:p-6 border-t border-slate-100 bg-white sticky bottom-0 z-20 pb-[calc(1rem+env(safe-area-inset-bottom))]">
                     <div className="mb-4">
                       <button 
