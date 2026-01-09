@@ -201,7 +201,7 @@ const FlightCard: React.FC<{
          durationDisplay = `~${hours}h ${mins}m`;
 
          // Only calculate if user hasn't manually set arrival time
-         if (!flight.arrivalTime || flight.arrivalTime === '14:00') {
+         if (true) {
            const [h, m] = depTime.split(':').map(Number);
            const originOffsetMins = AIRPORT_OFFSETS[from] * 60;
            const utcDepMins = (h * 60 + m) - originOffsetMins;
