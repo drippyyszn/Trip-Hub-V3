@@ -407,7 +407,7 @@ const StayCard: React.FC<{
         ) : (
           <>
             <div className="flex justify-between items-start mb-1">
-              <h4 className="text-xl font-black text-slate-900 truncate">{stay.name || 'Unnamed Stay'}</h4>
+              <h4 className="text-xl font-black text-slate-900 uppercase truncate">{stay.name || 'Unnamed Stay'}</h4>
               {stay.cost !== undefined && <span className="text-xs font-black text-emerald-600">{currencySymbol}{stay.cost}</span>}
             </div>
             <p className="text-[9px] font-bold text-slate-400 uppercase mb-4 truncate">{stay.address || 'Address pending...'}</p>
