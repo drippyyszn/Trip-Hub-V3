@@ -1124,7 +1124,7 @@ const App: React.FC = () => {
       <main className="flex-1 flex flex-col md:overflow-hidden min-h-0">
         {activeTrip ? (
           <div className="flex-1 flex flex-col md:flex-row md:overflow-hidden">
-            <div className={`w-full md:w-[400px] ${isChatCollapsed ? 'h-auto' : 'h-[60dvh]'} md:h-full shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-slate-50 bg-white shadow-sm z-40 sticky top-0 md:static transition-[height] duration-300 ease-in-out pb-24 md:pb-0`}>
+            <div className={`w-full md:w-[400px] ${isChatCollapsed ? 'h-auto' : 'h-[60dvh]'} md:h-full shrink-0 flex flex-col border-b md:border-b-0 md:border-r border-slate-50 bg-white shadow-sm z-40 md:static transition-[height] duration-300 ease-in-out pb-24 md:pb-0`}>
               <div className="p-4 md:p-6 border-b border-slate-50 flex items-center justify-between bg-white relative z-50">
   <div className="flex items-center gap-3 flex-1 min-w-0">
      <button 
