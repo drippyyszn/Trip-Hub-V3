@@ -750,6 +750,37 @@ const App: React.FC = () => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    if (isLeftSwipe && isChatCollapsed) {
+      setIsChatCollapsed(false);
+    }
+    if (isRightSwipe && !isChatCollapsed) {
+      setIsChatCollapsed(true);
+    }
+  };
+
   // Load trips from Mock Supabase (LocalStorage) on mount
   useEffect(() => {
     const loadTrips = async () => {
@@ -845,6 +876,22 @@ const App: React.FC = () => {
     setTrips(prev => [...prev, newTrip]);
     setActiveTripId(newTrip.id);
     setActiveModal(null);
+  };
+
+const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
+    e.stopPropagation();
+    const original = trips.find(t => t.id === tripId);
+    if (!original) return;
+    
+    const newTrip: Trip = {
+      ...original,
+      id: `trip-${Date.now()}`,
+      name: `${original.name} (Copy)`,
+      messages: [],
+      lastUpdated: Date.now()
+    };
+    setTrips(prev => [...prev, newTrip]);
+    setActiveTripId(newTrip.id);
   };
   
    const handleDeleteTrip = async (e: React.MouseEvent, tripId: string) => {
@@ -1086,6 +1133,74 @@ const App: React.FC = () => {
   }
 };
 
+  const tripStats = useMemo(() => {
+    if (!activeTrip) return null;
+    
+    const tripCurrency = activeTrip.preferredCurrency || 'CAD';
+    
+    // Calculate total costs
+    let totalFlightCost = 0;
+    activeTrip.flights?.forEach(f => {
+      if (f.cost) totalFlightCost += convertCurrency(f.cost, f.currency || tripCurrency, tripCurrency);
+    });
+    
+    let totalAccommodationCost = 0;
+    activeTrip.accommodations?.forEach(a => {
+      if (a.cost) totalAccommodationCost += convertCurrency(a.cost, a.currency || tripCurrency, tripCurrency);
+    });
+    
+    let totalTransitCost = 0;
+    activeTrip.transit?.forEach(t => {
+      if (t.cost) totalTransitCost += convertCurrency(t.cost, t.currency || tripCurrency, tripCurrency);
+    });
+    
+    let totalExpenses = 0;
+    activeTrip.expenses?.filter(e => e.category !== 'debt').forEach(e => {
+      totalExpenses += convertCurrency(e.amount, e.currency, tripCurrency);
+    });
+    
+    const totalCost = totalFlightCost + totalAccommodationCost + totalTransitCost + totalExpenses;
+    const costPerPerson = activeTrip.travellers.length > 0 ? totalCost / activeTrip.travellers.length : 0;
+    
+    // Calculate booking status
+    const totalFlights = activeTrip.flights?.length || 0;
+    const confirmedFlights = activeTrip.flights?.filter(f => f.status === 'confirmed' || f.status === 'checked-in').length || 0;
+    
+    const totalStays = activeTrip.accommodations?.length || 0;
+    const bookedStays = activeTrip.accommodations?.filter(a => a.isBooked).length || 0;
+    
+    const totalTransit = activeTrip.transit?.length || 0;
+    const bookedTransit = activeTrip.transit?.filter(t => t.isBooked).length || 0;
+    
+    // Days until trip
+    let daysUntil = null;
+    if (activeTrip.startDate) {
+      const start = new Date(activeTrip.startDate);
+      const today = new Date();
+      const diffTime = start.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      daysUntil = diffDays;
+    }
+    
+    return {
+      totalCost,
+      costPerPerson,
+      totalFlights,
+      confirmedFlights,
+      totalStays,
+      bookedStays,
+      totalTransit,
+      bookedTransit,
+      daysUntil,
+      breakdown: {
+        flights: totalFlightCost,
+        accommodation: totalAccommodationCost,
+        transit: totalTransitCost,
+        expenses: totalExpenses
+      }
+    };
+  }, [activeTrip]);
+
   const debtSummary = useMemo(() => {
   if (!activeTrip || !activeTrip.travellers?.length) return [];
   
@@ -1229,7 +1344,12 @@ const App: React.FC = () => {
   useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; }, [activeTrip?.messages, isProcessing]);
 
   return (
-    <div className="flex flex-col md:flex-row md:h-screen bg-[#FDFDFD] md:overflow-hidden min-h-screen text-slate-900 antialiased font-['Inter']">
+    <div 
+      className="flex flex-col md:flex-row md:h-screen bg-[#FDFDFD] md:overflow-hidden min-h-screen text-slate-900 antialiased font-['Inter']"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       <aside
   className={`bg-white border-r border-slate-100 flex flex-col shadow-sm z-50
   ${showSidebar ? 'fixed inset-0 w-full h-full flex' : 'hidden'}
@@ -1262,8 +1382,10 @@ const App: React.FC = () => {
                 <MapPin className="w-4 h-4 shrink-0" /> 
                 <span className="font-black text-xs uppercase max-w-[180px] truncate block">{trip.name}</span>
               </div>
-              <button onClick={(e) => handleDeleteTrip(e, trip.id)}
- className="p-1 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-3.5 h-3.5" /></button>
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <button onClick={(e) => handleCopyTrip(e, trip.id)} className="p-1 hover:text-sky-500 transition-colors" title="Copy trip"><Bookmark className="w-3.5 h-3.5" /></button>
+                <button onClick={(e) => handleDeleteTrip(e, trip.id)} className="p-1 hover:text-rose-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+              </div>
             </div>
           ))}
         </div>
@@ -1341,7 +1463,14 @@ const App: React.FC = () => {
                       </div>
                     </div>
                     <div className="relative">
-                      <textarea value={inputText} onChange={e => setInputText(e.target.value)} onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())} placeholder="Type a command: flight, hotel, expense, activity..." className="w-full pl-6 pr-14 py-4 bg-slate-50 border rounded-2xl text-xs font-semibold h-24 resize-none outline-none focus:bg-white transition-all shadow-inner" />
+                      <textarea 
+                        value={inputText} 
+                        onChange={e => setInputText(e.target.value)} 
+                        onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())} 
+                        placeholder="Type a command: flight, hotel, expense, activity..." 
+                        className="w-full pl-6 pr-14 py-4 bg-slate-50 border rounded-2xl text-xs font-semibold h-24 resize-none outline-none focus:bg-white transition-all shadow-inner"
+                        style={{ fontSize: '16px' }} // Prevents iOS zoom on focus
+                      />
                       <button onClick={() => handleSendMessage()} disabled={isProcessing || !inputText.trim()} className="absolute right-3 bottom-3 p-3 bg-slate-900 text-white rounded-xl shadow-lg hover:bg-sky-600 active:scale-95 disabled:opacity-50 transition-all"><Send className="w-4 h-4" /></button>
                     </div>
                   </div>
@@ -1555,6 +1684,82 @@ const App: React.FC = () => {
                 )}
                 {activeTab === 'details' && (
                   <div className="max-w-2xl mx-auto space-y-12 animate-in fade-in">
+                    {/* Trip Stats Dashboard */}
+                    {tripStats && (
+                      <section className="bg-gradient-to-br from-sky-50 to-indigo-50 p-8 rounded-[3rem] border border-sky-100 shadow-xl">
+                        <h3 className="text-xs font-black uppercase text-slate-400 tracking-widest mb-6 flex items-center gap-2">
+                          <PieChart className="w-5 h-5 text-sky-500" /> Trip Overview
+                        </h3>
+                        
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Total Cost</p>
+                            <p className="text-2xl font-black text-slate-900">{currencySymbol}{tripStats.totalCost.toFixed(0)}</p>
+                          </div>
+                          
+                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Per Person</p>
+                            <p className="text-2xl font-black text-emerald-600">{currencySymbol}{tripStats.costPerPerson.toFixed(0)}</p>
+                          </div>
+                          
+                          {tripStats.daysUntil !== null && (
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                              <p className="text-[8px] font-black uppercase text-slate-400 mb-1">
+                                {tripStats.daysUntil > 0 ? 'Days Until' : tripStats.daysUntil === 0 ? 'Today!' : 'Days Ago'}
+                              </p>
+                              <p className="text-2xl font-black text-sky-600">{Math.abs(tripStats.daysUntil)}</p>
+                            </div>
+                          )}
+                          
+                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Bookings</p>
+                            <p className="text-2xl font-black text-indigo-600">
+                              {tripStats.confirmedFlights + tripStats.bookedStays + tripStats.bookedTransit}/
+                              {tripStats.totalFlights + tripStats.totalStays + tripStats.totalTransit}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100">
+                          <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Breakdown</p>
+                          <div className="space-y-3">
+                            {tripStats.breakdown.flights > 0 && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-slate-600 flex items-center gap-2">
+                                  <Plane className="w-3 h-3 text-sky-500"/> Flights
+                                </span>
+                                <span className="text-sm font-black text-slate-900">{currencySymbol}{tripStats.breakdown.flights.toFixed(0)}</span>
+                              </div>
+                            )}
+                            {tripStats.breakdown.accommodation > 0 && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-slate-600 flex items-center gap-2">
+                                  <Hotel className="w-3 h-3 text-indigo-500"/> Accommodation
+                                </span>
+                                <span className="text-sm font-black text-slate-900">{currencySymbol}{tripStats.breakdown.accommodation.toFixed(0)}</span>
+                              </div>
+                            )}
+                            {tripStats.breakdown.transit > 0 && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-slate-600 flex items-center gap-2">
+                                  <Ship className="w-3 h-3 text-emerald-500"/> Transit
+                                </span>
+                                <span className="text-sm font-black text-slate-900">{currencySymbol}{tripStats.breakdown.transit.toFixed(0)}</span>
+                              </div>
+                            )}
+                            {tripStats.breakdown.expenses > 0 && (
+                              <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-bold text-slate-600 flex items-center gap-2">
+                                  <Wallet className="w-3 h-3 text-amber-500"/> Expenses
+                                </span>
+                                <span className="text-sm font-black text-slate-900">{currencySymbol}{tripStats.breakdown.expenses.toFixed(0)}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </section>
+                    )}
+                    
                     <section className="bg-white p-12 rounded-[3rem] border shadow-xl">
                       <div className="flex justify-between items-center mb-10">
                         <h3 className="text-xs font-black uppercase text-slate-400 tracking-widest flex items-center gap-3"><Users className="w-5 h-5 text-sky-500" /> Travellers</h3>
