@@ -980,6 +980,39 @@ const App: React.FC = () => {
   setTrips(prev => prev.map(t => t.id === activeTripId ? { ...t, messages: [...(t.messages || []), newUserMsg] } : t));
   
   try {
+    const low = text.toLowerCase().trim();
+    
+    // Check for help keywords first
+    const helpKeywords: Record<string, string> = {
+      'flight': '✈️ **To add a flight:**\n\nTry: "flight Montreal (YUL) to Paris (CDG) July 15-30"\n\nOr click the + button in the Bookings tab → Flights section to enter details manually.',
+      'hotel': '🏨 **To add accommodation:**\n\nTry: "hotel in Paris July 16-25"\n\nOr click the + button in the Bookings tab → Accommodation section to add manually.',
+      'accommodation': '🏨 **To add accommodation:**\n\nTry: "hotel in Paris July 16-25"\n\nOr click the + button in the Bookings tab → Accommodation section to add manually.',
+      'stay': '🏨 **To add accommodation:**\n\nTry: "hotel in Paris July 16-25"\n\nOr click the + button in the Bookings tab → Accommodation section to add manually.',
+      'ferry': '⛴️ **To add a ferry:**\n\nTry: "ferry Athens to Santorini July 5 at 10am"\n\nOr click the + button in the Bookings tab → Transit section.',
+      'train': '🚆 **To add a train:**\n\nTry: "train Paris to Lyon July 20 at 2pm"\n\nOr click the + button in the Bookings tab → Transit section.',
+      'bus': '🚌 **To add a bus:**\n\nTry: "bus Barcelona to Madrid July 10 at 9am"\n\nOr click the + button in the Bookings tab → Transit section.',
+      'transit': '🚆 **To add transit:**\n\nTry: "train Paris to Lyon July 20 at 2pm"\n\nOr click the + button in the Bookings tab → Transit section.',
+      'expense': '💰 **To log an expense:**\n\nTry: "dinner $120 split between Sarah and John"\n\nOr click "Log Transaction" in the Expenses tab to enter manually.',
+      'split': '💰 **To split an expense:**\n\nTry: "taxi $45 split equally" or "lunch $80 split between Alice and Bob"\n\nOr click "Log Transaction" in the Expenses tab.',
+      'activity': '📍 **To add an activity:**\n\nTry: "visit Louvre Museum July 18 at 10am"\n\nOr click the + button in the Timeline tab to add manually.',
+      'visit': '📍 **To add an activity:**\n\nTry: "visit Eiffel Tower July 17 at 3pm"\n\nOr click the + button in the Timeline tab.',
+      'help': '💡 **Available Commands:**\n\n• "flight [from] to [destination] [dates]"\n• "hotel in [city] [dates]"\n• "ferry/train/bus [from] to [destination] [date]"\n• "expense $[amount] split [method]"\n• "visit [place] [date] at [time]"\n\nOr use the + buttons in each tab to add items manually!'
+    };
+    
+    // Check if user is asking for help about a specific feature
+    for (const [keyword, response] of Object.entries(helpKeywords)) {
+      if (low === keyword || low === `${keyword}?` || low === `how to add ${keyword}` || low === `add ${keyword}`) {
+        const helpMsg: ChatMessage = { 
+          id: `ai-${Date.now()}`, 
+          role: 'assistant', 
+          content: response, 
+          timestamp: Date.now() 
+        };
+        setTrips(prev => prev.map(t => t.id === activeTripId ? { ...t, messages: [...(t.messages || []), helpMsg] } : t));
+        return;
+      }
+    }
+    
     // Use ONLY local parser (no AI/Gemini)
     const localResult = parseLocalCommand(text, activeTrip);
     
