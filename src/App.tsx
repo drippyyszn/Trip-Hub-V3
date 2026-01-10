@@ -1049,24 +1049,20 @@ const App: React.FC = () => {
       }));
       
       // Auto-switch tabs
-      const low = text.toLowerCase();
       if (low.includes('split') || low.includes('expense')) setActiveTab('expenses');
       else if (low.includes('flight') || low.includes('hotel') || low.includes('transit')) setActiveTab('bookings');
       else if (low.includes('activity') || low.includes('visit')) setActiveTab('itinerary');
       
     } else {
       // Command not recognized - give smart hints
-      const low = text.toLowerCase();
-      let hint = "I couldn't understand that command.";
+      let hint = "I couldn't understand that command. Type 'help' to see available commands, or use the + buttons in each tab to add items manually.";
       
       if (low.includes('book') || low.includes('reserve')) {
-        hint = "💡 Enter it manually";
+        hint = "💡 Try a more specific command like:\n• 'flight Montreal to Paris July 15'\n• 'hotel in Paris July 16-25'\n\nOr use the + buttons in the Bookings tab.";
       } else if (low.includes('cost') || low.includes('pay') || low.includes('owe')) {
-        hint = "💡 Enter it manually";
+        hint = "💡 To log expenses, try:\n• 'dinner $80 split equally'\n• 'taxi $45 split between Alice and Bob'\n\nOr click 'Log Transaction' in the Expenses tab.";
       } else if (low.includes('go') || low.includes('see') || low.includes('do')) {
-        hint = "💡 Enter it manually";
-      } else {
-        hint = "💡 Enter it manually'";
+        hint = "💡 To add activities, try:\n• 'visit Louvre Museum July 18 at 10am'\n• 'dinner reservation July 19 at 7pm'\n\nOr use the + button in the Timeline tab.";
       }
       
       const errMsg: ChatMessage = { 
