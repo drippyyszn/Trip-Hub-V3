@@ -1146,7 +1146,11 @@ const App: React.FC = () => {
   });
 }, [activeTrip]);
 
-  (activeTrip.flights || []).forEach(f => {
+  const consolidatedTimeline = useMemo(() => {
+    if (!activeTrip) return [];
+    const timeline: any[] = [];
+    (activeTrip.flights || []).forEach(f => {
+    
   const origin = f.departureAirport || f.departureCity || 'TBD';
   const dest = f.arrivalAirport || f.arrivalCity || 'TBD';
   const details = `${f.airline || 'Flight'} | ${f.flightNumber || 'TBD'}`;
