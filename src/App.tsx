@@ -1243,7 +1243,10 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
     // Calculate total costs
     let totalFlightCost = 0;
     activeTrip.flights?.forEach(f => {
-      if (f.cost) totalFlightCost += convertCurrency(f.cost, f.currency || tripCurrency, tripCurrency);
+      if (f.cost) {
+        const convertedCost = convertCurrency(f.cost, f.currency || tripCurrency, tripCurrency);
+        totalFlightCost += convertedCost;
+      }
     });
     
     let totalAccommodationCost = 0;
@@ -1836,9 +1839,37 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                           <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Per Traveller</p>
                           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                             {activeTrip.travellers.map(traveller => {
-                              // Calculate this traveller's total cost from all expenses
+                              // Calculate this traveller's total cost from all expenses AND bookings
                               let travellerCost = 0;
                               
+                              // Add flight costs for flights this traveller is on
+                              activeTrip.flights?.forEach(flight => {
+                                if (flight.cost && flight.travellerIds && flight.travellerIds.includes(traveller.id)) {
+                                  const convertedCost = convertCurrency(flight.cost, flight.currency || tripCurrency, tripCurrency);
+                                  const sharePerPerson = convertedCost / Math.max(1, flight.travellerIds.length);
+                                  travellerCost += sharePerPerson;
+                                }
+                              });
+                              
+                              // Add accommodation costs for stays this traveller is on
+                              activeTrip.accommodations?.forEach(stay => {
+                                if (stay.cost && stay.travellerIds && stay.travellerIds.includes(traveller.id)) {
+                                  const convertedCost = convertCurrency(stay.cost, stay.currency || tripCurrency, tripCurrency);
+                                  const sharePerPerson = convertedCost / Math.max(1, stay.travellerIds.length);
+                                  travellerCost += sharePerPerson;
+                                }
+                              });
+                              
+                              // Add transit costs for transit this traveller is on
+                              activeTrip.transit?.forEach(transit => {
+                                if (transit.cost && transit.travellerIds && transit.travellerIds.includes(traveller.id)) {
+                                  const convertedCost = convertCurrency(transit.cost, transit.currency || tripCurrency, tripCurrency);
+                                  const sharePerPerson = convertedCost / Math.max(1, transit.travellerIds.length);
+                                  travellerCost += sharePerPerson;
+                                }
+                              });
+                              
+                              // Add expense costs
                               activeTrip.expenses?.filter(e => e.category !== 'debt').forEach(exp => {
                                 const participants = exp.participantsTravellerIds?.length 
                                   ? exp.participantsTravellerIds 
