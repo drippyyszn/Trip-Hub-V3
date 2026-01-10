@@ -133,6 +133,53 @@ const formatDateDisplay = (dateStr?: string) => {
   } catch { return dateStr; }
 };
 
+const computeEstimatedArrival = (flight: Flight) => {
+  const from = (flight.departureAirport || '').toUpperCase();
+  const to = (flight.arrivalAirport || '').toUpperCase();
+  const depTime = flight.departureTime;
+
+  if (!depTime || !depTime.includes(':')) return null;
+  if (AIRPORT_OFFSETS[from] === undefined || AIRPORT_OFFSETS[to] === undefined) return null;
+
+  const key = `${from}-${to}`;
+  const durationMins = FLIGHT_ESTIMATES[key];
+  if (!durationMins || durationMins <= 0) return null;
+
+  const [h, m] = depTime.split(':').map(Number);
+
+  const originOffsetMins = AIRPORT_OFFSETS[from] * 60;
+  const utcDepMins = (h * 60 + m) - originOffsetMins;
+
+  const utcArrMins = utcDepMins + durationMins;
+  const destOffsetMins = AIRPORT_OFFSETS[to] * 60;
+
+  const localArrMinsTotal = utcArrMins + destOffsetMins;
+
+  let localArrMins = localArrMinsTotal;
+  let dayOffset = 0;
+  while (localArrMins >= 1440) { localArrMins -= 1440; dayOffset++; }
+  while (localArrMins < 0) { localArrMins += 1440; dayOffset--; }
+
+  const arrH = Math.floor(localArrMins / 60);
+  const arrM = localArrMins % 60;
+
+  const ampm = arrH >= 12 ? 'PM' : 'AM';
+  const h12 = arrH % 12 || 12;
+
+  const arrivalTimeDisplay =
+    `${h12}:${arrM.toString().padStart(2, '0')} ${ampm}` +
+    (dayOffset !== 0 ? ` (${dayOffset > 0 ? '+' : ''}${dayOffset}d)` : '');
+
+  let arrivalDate: string | undefined = flight.arrivalDate || undefined;
+  if (!arrivalDate && flight.departureDate) {
+    const d = new Date(flight.departureDate + 'T12:00:00');
+    d.setDate(d.getDate() + dayOffset);
+    arrivalDate = d.toISOString().split('T')[0];
+  }
+
+  return { arrivalTimeDisplay, arrivalDate };
+};
+
 const getActivityIcon = (category: string) => {
   switch (category.toLowerCase()) {
     case 'food': return <Utensils className="w-4 h-4" />;
@@ -1099,13 +1146,14 @@ const App: React.FC = () => {
   });
 }, [activeTrip]);
 
-  const consolidatedTimeline = useMemo(() => {
-    if (!activeTrip) return [];
-    const timeline: any[] = [];
-    (activeTrip.flights || []).forEach(f => {
+  (activeTrip.flights || []).forEach(f => {
   const origin = f.departureAirport || f.departureCity || 'TBD';
   const dest = f.arrivalAirport || f.arrivalCity || 'TBD';
   const details = `${f.airline || 'Flight'} | ${f.flightNumber || 'TBD'}`;
+
+  const est = computeEstimatedArrival(f);
+  const landingTime = f.arrivalTime || est?.arrivalTimeDisplay; // ✅ fallback to calculated time
+  const landingDate = f.arrivalDate || est?.arrivalDate || f.departureDate || '';
 
   // Departure event
   timeline.push({
@@ -1118,15 +1166,15 @@ const App: React.FC = () => {
     category: 'travel'
   });
 
-  // Landing / arrival event
-  if (f.arrivalDate || f.arrivalTime) {
+  // Landing event
+  if (landingDate || landingTime) {
     timeline.push({
       id: `${f.id}-arr`,
-      date: f.arrivalDate || f.departureDate || '',
+      date: landingDate,
       title: `Landing: ${dest}`,
       type: 'flight',
       details,
-      time: f.arrivalTime,
+      time: landingTime, // ✅ will show even if you never typed arrivalTime
       category: 'travel'
     });
   }
