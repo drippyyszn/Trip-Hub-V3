@@ -1534,7 +1534,21 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
               <div className="flex px-4 md:px-10 border-t md:border-t-0 md:border-b border-slate-50 bg-white/95 shrink-0 z-30 overflow-x-auto no-scrollbar fixed bottom-0 left-0 right-0 md:static">
                 {(['itinerary', 'bookings', 'expenses', 'details'] as const).map(tab => (<button key={tab} onClick={() => setActiveTab(tab)} className={`py-6 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 px-8 transition-all shrink-0 ${activeTab === tab ? 'border-sky-600 text-sky-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}>{tab}</button>))}
               </div>
-              <div className="flex-1 p-4 md:p-10 custom-scrollbar md:overflow-y-auto pb-32 md:pb-10">
+              <div 
+                className="flex-1 p-4 md:p-10 custom-scrollbar md:overflow-y-auto pb-32 md:pb-10 relative"
+                onTouchStart={handlePullStart}
+                onTouchMove={handlePullMove}
+                onTouchEnd={handlePullEnd}
+                style={{ transform: `translateY(${Math.min(pullDistance * 0.5, 60)}px)`, transition: isPulling ? 'none' : 'transform 0.3s ease-out' }}
+              >
+                {isPulling && pullDistance > 20 && (
+                  <div className="md:hidden absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full pb-4">
+                    <div className={`flex items-center gap-2 text-xs font-bold ${pullDistance > 80 ? 'text-sky-600' : 'text-slate-400'}`}>
+                      <Loader2 className={`w-4 h-4 ${pullDistance > 80 ? 'animate-spin' : ''}`} />
+                      {pullDistance > 80 ? 'Release to refresh' : 'Pull to refresh'}
+                    </div>
+                  </div>
+                )}
                 {activeTab === 'bookings' && (
                   <div className="max-w-5xl mx-auto space-y-16 animate-in fade-in">
                     <section>
