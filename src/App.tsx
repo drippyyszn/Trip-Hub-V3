@@ -366,6 +366,30 @@ const FlightCard: React.FC<{
                 placeholder="0.00"
               />
             </div>
+            
+            <div className="col-span-2 space-y-2">
+              <label className="text-[8px] font-black uppercase text-slate-400">Travellers on this flight</label>
+              <div className="space-y-2 max-h-32 overflow-y-auto custom-scrollbar">
+                {travellers.map(t => (
+                  <div key={t.id} className="flex items-center gap-3 bg-slate-800 p-2 rounded-lg">
+                    <input 
+                      type="checkbox" 
+                      checked={(flight.travellerIds || []).includes(t.id)}
+                      onChange={() => {
+                        const current = flight.travellerIds || [];
+                        const updated = current.includes(t.id)
+                          ? current.filter(id => id !== t.id)
+                          : [...current, t.id];
+                        onEdit(flight.id, 'travellerIds', updated);
+                      }}
+                      className="w-4 h-4 rounded bg-slate-900 border-slate-600 checked:bg-sky-500"
+                    />
+                    <span className="text-[10px] font-bold text-white">{t.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
             <div className="col-span-2 text-center text-[9px] text-slate-500 italic mt-2">Press Enter to save</div>
           </div>
         ) : (
@@ -387,10 +411,15 @@ const FlightCard: React.FC<{
           </div>
         )}
         <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-500 pt-3 border-t border-slate-800">
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-wrap items-center">
              {flight.cost && flight.cost > 0 && (
                <span className="flex items-center gap-1 text-emerald-400">
                  <DollarSign className="w-3 h-3"/> {currencySymbol}{flight.cost.toFixed(0)}
+               </span>
+             )}
+             {flight.travellerIds && flight.travellerIds.length > 0 && (
+               <span className="flex items-center gap-1 text-sky-400">
+                 <Users className="w-3 h-3"/> {flight.travellerIds.map(id => travellers.find(t => t.id === id)?.name).filter(Boolean).join(', ')}
                </span>
              )}
           </div>
@@ -1025,6 +1054,14 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
     setTrips(prev => prev.map(t => {
       if (t.id !== activeTripId) return t;
       const id = `${type.substring(0, 2)}-${Date.now()}`;
+      // Handle multiple travellerIds from checkboxes
+      if (type === 'flight' && data.travellerIds) {
+        const formData = data as any;
+        const travellerIds = Array.isArray(formData.travellerIds) 
+          ? formData.travellerIds 
+          : [formData.travellerIds];
+        data = { ...data, travellerIds };
+      }
       if (type === 'activity') {
         const newItinerary = [...(t.itinerary || [])];
         let day = newItinerary.find(d => d.date === data.date);
@@ -1972,6 +2009,23 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
             <div className="col-span-2 space-y-1">
                <label className="text-[8px] font-black uppercase text-slate-400">Booking URL</label>
                <input name="bookingUrl" className="w-full border p-2 rounded text-xs text-slate-900" placeholder="https://" />
+            </div>
+            
+            <div className="col-span-2 space-y-2">
+              <label className="text-[8px] font-black uppercase text-slate-400">Travellers on this flight (optional)</label>
+              <div className="space-y-2 max-h-32 overflow-y-auto custom-scrollbar bg-slate-50 p-3 rounded-lg">
+                {activeTrip?.travellers.map(t => (
+                  <label key={t.id} className="flex items-center gap-3 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      name="travellerIds"
+                      value={t.id}
+                      className="w-4 h-4 rounded border-slate-300"
+                    />
+                    <span className="text-[10px] font-bold text-slate-700">{t.name}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           </div>
           <button type="submit" className="w-full py-4 bg-sky-600 text-white rounded-[1.5rem] font-black uppercase text-[10px] shadow-lg hover:bg-sky-700 transition-all">Save Flight Details</button>
