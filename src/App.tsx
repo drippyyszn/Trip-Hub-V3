@@ -376,7 +376,11 @@ const FlightCard: React.FC<{
         )}
         <div className="flex justify-between items-center text-[9px] font-black uppercase text-slate-500 pt-3 border-t border-slate-800">
           <div className="flex gap-3">
-             {/* REMOVED SEAT + UNASSIGNED UI as per request */}
+             {flight.cost && flight.cost > 0 && (
+               <span className="flex items-center gap-1 text-emerald-400">
+                 <DollarSign className="w-3 h-3"/> {currencySymbol}{flight.cost.toFixed(0)}
+               </span>
+             )}
           </div>
           <div className="flex items-center gap-2">
             {flight.bookingUrl && <a href={flight.bookingUrl} target="_blank" rel="noreferrer" className="text-sky-500 hover:underline flex items-center gap-1"><ExternalLink className="w-3 h-3"/></a>}
@@ -779,6 +783,55 @@ const App: React.FC = () => {
     if (isRightSwipe && !isChatCollapsed) {
       setIsChatCollapsed(true);
     }
+  };
+
+  const [pullStartY, setPullStartY] = useState<number | null>(null);
+  const [isPulling, setIsPulling] = useState(false);
+  const [pullDistance, setPullDistance] = useState(0);
+
+  const handlePullStart = (e: React.TouchEvent) => {
+    const scrollTop = e.currentTarget.scrollTop;
+    if (scrollTop === 0) {
+      setPullStartY(e.touches[0].clientY);
+    }
+  };
+
+  const handlePullMove = (e: React.TouchEvent) => {
+    if (!pullStartY) return;
+    
+    const currentY = e.touches[0].clientY;
+    const distance = currentY - pullStartY;
+    
+    if (distance > 0 && distance < 150) {
+      setPullDistance(distance);
+      setIsPulling(true);
+    }
+  };
+
+  const handlePullEnd = async () => {
+    if (pullDistance > 80) {
+      // Trigger refresh
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase.from('trips').select('*').order('last_updated', { ascending: false });
+        if (error) throw error;
+        if (data) {
+          setTrips(data.map((row: any) => {
+            if (row.data && typeof row.data === 'string') {
+              return JSON.parse(row.data);
+            }
+            return row;
+          }));
+        }
+      } catch (error) {
+        console.error('Error refreshing trips:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    setPullStartY(null);
+    setIsPulling(false);
+    setPullDistance(0);
   };
 
   // Load trips from Mock Supabase (LocalStorage) on mount
@@ -1861,6 +1914,19 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
             <div className="col-span-2 space-y-1">
                <label className="text-[8px] font-black uppercase text-slate-400">Booking URL</label>
                <input name="bookingUrl" className="w-full border p-2 rounded text-xs text-slate-900" placeholder="https://" />
+            </div>
+            <div className="col-span-2 space-y-1">
+               <label className="text-[8px] font-black uppercase text-slate-400">Flight Cost ({currencySymbol}) - Optional</label>
+               <input 
+                 type="number" 
+                 step="0.01"
+                 name="cost" 
+                 className="w-full border border-slate-700 text-white p-2 text-[10px] rounded" 
+                 value={flight.cost || ''} 
+                 onChange={e => onEdit(flight.id, 'cost', parseFloat(e.target.value) || 0)} 
+                 onKeyDown={handleKeyDown}
+                 placeholder="0.00"
+               />
             </div>
           </div>
           <button type="submit" className="w-full py-4 bg-sky-600 text-white rounded-[1.5rem] font-black uppercase text-[10px] shadow-lg hover:bg-sky-700 transition-all">Save Flight Details</button>
