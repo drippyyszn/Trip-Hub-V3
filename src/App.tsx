@@ -354,6 +354,18 @@ const FlightCard: React.FC<{
               <input type="date" className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded mb-1" value={flight.arrivalDate} onChange={e => onEdit(flight.id, 'arrivalDate', e.target.value)} onKeyDown={handleKeyDown} />
               <input type="time" className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded" value={flight.arrivalTime} onChange={e => onEdit(flight.id, 'arrivalTime', e.target.value)} onKeyDown={handleKeyDown} />
             </div>
+            <div className="col-span-2 space-y-1">
+              <label className="text-[8px] font-black uppercase text-slate-400">Flight Cost ({currencySymbol}) - Optional</label>
+              <input 
+                type="number" 
+                step="0.01"
+                className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded" 
+                value={flight.cost || ''} 
+                onChange={e => onEdit(flight.id, 'cost', parseFloat(e.target.value) || 0)} 
+                onKeyDown={handleKeyDown}
+                placeholder="0.00"
+              />
+            </div>
             <div className="col-span-2 text-center text-[9px] text-slate-500 italic mt-2">Press Enter to save</div>
           </div>
         ) : (
