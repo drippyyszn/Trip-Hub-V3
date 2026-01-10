@@ -1776,11 +1776,6 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                             <p className="text-2xl font-black text-slate-900">{currencySymbol}{tripStats.totalCost.toFixed(0)}</p>
                           </div>
                           
-                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
-                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Per Person</p>
-                            <p className="text-2xl font-black text-emerald-600">{currencySymbol}{tripStats.costPerPerson.toFixed(0)}</p>
-                          </div>
-                          
                           {tripStats.daysUntil !== null && (
                             <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
                               <p className="text-[8px] font-black uppercase text-slate-400 mb-1">
@@ -1796,6 +1791,43 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                               {tripStats.confirmedFlights + tripStats.bookedStays + tripStats.bookedTransit}/
                               {tripStats.totalFlights + tripStats.totalStays + tripStats.totalTransit}
                             </p>
+                          </div>
+                        </div>
+                        
+                        {/* Per Traveller Costs */}
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 mb-6">
+                          <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Per Traveller</p>
+                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                            {activeTrip.travellers.map(traveller => {
+                              // Calculate this traveller's total cost from all expenses
+                              let travellerCost = 0;
+                              
+                              activeTrip.expenses?.filter(e => e.category !== 'debt').forEach(exp => {
+                                const participants = exp.participantsTravellerIds?.length 
+                                  ? exp.participantsTravellerIds 
+                                  : activeTrip.travellers.map(t => t.id);
+                                
+                                if (participants.includes(traveller.id)) {
+                                  // Find this traveller's share
+                                  let share = 0;
+                                  if (exp.splits && exp.splits.length > 0) {
+                                    const split = exp.splits.find(s => s.travellerId === traveller.id);
+                                    share = split?.amount || 0;
+                                  } else {
+                                    share = exp.amount / Math.max(1, participants.length);
+                                  }
+                                  // Convert to trip currency
+                                  travellerCost += convertCurrency(share, exp.currency, activeTrip.preferredCurrency || 'CAD');
+                                }
+                              });
+                              
+                              return (
+                                <div key={traveller.id} className="bg-slate-50 p-3 rounded-xl flex justify-between items-center">
+                                  <span className="text-[10px] font-black uppercase text-slate-600">{traveller.name}</span>
+                                  <span className="text-sm font-black text-slate-900">{currencySymbol}{travellerCost.toFixed(0)}</span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                         
