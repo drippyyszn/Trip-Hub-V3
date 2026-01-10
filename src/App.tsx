@@ -1929,16 +1929,6 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                <label className="text-[8px] font-black uppercase text-slate-400">Booking URL</label>
                <input name="bookingUrl" className="w-full border p-2 rounded text-xs text-slate-900" placeholder="https://" />
             </div>
-            <div className="col-span-2 space-y-1">
-               <label className="text-[8px] font-black uppercase text-slate-400">Flight Cost ({currencySymbol}) - Optional</label>
-               <input 
-                 type="number" 
-                 step="0.01"
-                 name="cost" 
-                 className="w-full border p-2 rounded text-xs text-slate-900 bg-white" 
-                 placeholder="0.00"
-               />
-            </div>
           </div>
           <button type="submit" className="w-full py-4 bg-sky-600 text-white rounded-[1.5rem] font-black uppercase text-[10px] shadow-lg hover:bg-sky-700 transition-all">Save Flight Details</button>
         </form>
