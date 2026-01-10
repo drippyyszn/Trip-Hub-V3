@@ -1921,10 +1921,7 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                  type="number" 
                  step="0.01"
                  name="cost" 
-                 className="w-full border border-slate-700 text-white p-2 text-[10px] rounded" 
-                 value={flight.cost || ''} 
-                 onChange={e => onEdit(flight.id, 'cost', parseFloat(e.target.value) || 0)} 
-                 onKeyDown={handleKeyDown}
+                 className="w-full border p-2 rounded text-xs text-slate-900 bg-white" 
                  placeholder="0.00"
                />
             </div>
