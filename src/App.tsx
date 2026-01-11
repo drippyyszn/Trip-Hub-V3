@@ -434,10 +434,11 @@ const FlightCard: React.FC<{
 
 const StayCard: React.FC<{
   stay: Accommodation;
+  travellers: Traveller[];
   currencySymbol: string;
   onEdit: (id: string, field: string, value: any) => void;
   onDelete: (id: string) => void;
-}> = ({ stay, currencySymbol, onEdit, onDelete }) => {
+}> = ({ stay, travellers, currencySymbol, onEdit, onDelete }) => {
   const [isEditing, setIsEditing] = useState(false);
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter') setIsEditing(false); };
 
@@ -494,6 +495,30 @@ const StayCard: React.FC<{
                 <button type="button" onClick={() => onEdit(stay.id, 'isBooked', !stay.isBooked)} className={`w-full py-2 border rounded text-[10px] font-bold uppercase ${stay.isBooked ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-50 text-slate-400 border-slate-200'}`}>{stay.isBooked ? 'Booked' : 'Unbooked'}</button>
               </div>
             </div>
+            
+            <div className="col-span-2 space-y-2">
+              <label className="text-[8px] font-black uppercase text-slate-400">Travellers staying here</label>
+              <div className="space-y-2 max-h-32 overflow-y-auto custom-scrollbar">
+                {travellers.map(t => (
+                  <div key={t.id} className="flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                    <input 
+                      type="checkbox" 
+                      checked={(stay.travellerIds || []).includes(t.id)}
+                      onChange={() => {
+                        const current = stay.travellerIds || [];
+                        const updated = current.includes(t.id)
+                          ? current.filter(id => id !== t.id)
+                          : [...current, t.id];
+                        onEdit(stay.id, 'travellerIds', updated);
+                      }}
+                      className="w-4 h-4 rounded bg-white border-slate-300 checked:bg-indigo-500"
+                    />
+                    <span className="text-[10px] font-bold text-slate-700">{t.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
             <div className="col-span-2 text-center text-[9px] text-slate-400 italic mt-2">Press Enter to save</div>
           </div>
         ) : (
@@ -1615,7 +1640,7 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                         <h3 className="text-2xl font-black uppercase italic flex items-center gap-3"><Hotel className="w-7 h-7 text-indigo-500" /> Accommodation</h3>
                         <button onClick={() => setActiveModal('stay')} className="p-2 bg-slate-900 text-white rounded-lg shadow-lg hover:scale-110 active:scale-95 transition-all"><Plus className="w-4 h-4" /></button>
                       </div>
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">{activeTrip.accommodations?.map(a => <StayCard key={a.id} stay={a} currencySymbol={currencySymbol} onEdit={handleEditLocal} onDelete={(id) => handleDeleteItem('accommodation', id)} />)}</div>
+                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">{activeTrip.accommodations?.map(a => <StayCard key={a.id} stay={a} travellers={activeTrip.travellers} currencySymbol={currencySymbol} onEdit={handleEditLocal} onDelete={(id) => handleDeleteItem('accommodation', id)} />)}</div>
                     </section>
                     <section>
                       <div className="flex justify-between items-center mb-8">
