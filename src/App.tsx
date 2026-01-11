@@ -1840,6 +1840,7 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                             {activeTrip.travellers.map(traveller => {
                               // Calculate this traveller's total cost from all expenses AND bookings
+                              const tripCurrency = activeTrip.preferredCurrency || 'CAD';
                               let travellerCost = 0;
                               
                               // Add flight costs for flights this traveller is on
