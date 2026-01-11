@@ -1807,34 +1807,10 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                     {tripStats && (
                       <section className="bg-gradient-to-br from-sky-50 to-indigo-50 p-8 rounded-[3rem] border border-sky-100 shadow-xl">
                         <h3 className="text-xs font-black uppercase text-slate-400 tracking-widest mb-6 flex items-center gap-2">
-                          <PieChart className="w-5 h-5 text-sky-500" /> Trip Overview
+                          <Wallet className="w-5 h-5 text-sky-500" /> Trip Overview
                         </h3>
                         
-                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
-                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Total Cost</p>
-                            <p className="text-2xl font-black text-slate-900">{currencySymbol}{tripStats.totalCost.toFixed(0)}</p>
-                          </div>
-                          
-                          {tripStats.daysUntil !== null && (
-                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
-                              <p className="text-[8px] font-black uppercase text-slate-400 mb-1">
-                                {tripStats.daysUntil > 0 ? 'Days Until' : tripStats.daysUntil === 0 ? 'Today!' : 'Days Ago'}
-                              </p>
-                              <p className="text-2xl font-black text-sky-600">{Math.abs(tripStats.daysUntil)}</p>
-                            </div>
-                          )}
-                          
-                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
-                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Bookings</p>
-                            <p className="text-2xl font-black text-indigo-600">
-                              {tripStats.confirmedFlights + tripStats.bookedStays + tripStats.bookedTransit}/
-                              {tripStats.totalFlights + tripStats.totalStays + tripStats.totalTransit}
-                            </p>
-                          </div>
-                        </div>
-                        
-                        {/* Per Traveller Costs */}
+                        {/* Cost Per Traveller - MAIN FOCUS */}
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100 mb-6">
                           <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Per Traveller</p>
                           <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
@@ -1897,6 +1873,35 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                             })}
                           </div>
                         </div>
+                        
+                        {/* Quick Stats - Secondary info */}
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Total Spent</p>
+                            <p className="text-lg font-black text-slate-500">{currencySymbol}{tripStats.totalCost.toFixed(0)}</p>
+                            <p className="text-[8px] text-slate-400 mt-1">For fun 🎉</p>
+                          </div>
+                          
+                          {tripStats.daysUntil !== null && (
+                            <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                              <p className="text-[8px] font-black uppercase text-slate-400 mb-1">
+                                {tripStats.daysUntil > 0 ? 'Days Until' : tripStats.daysUntil === 0 ? 'Today!' : 'Days Ago'}
+                              </p>
+                              <p className="text-lg font-black text-sky-600">{Math.abs(tripStats.daysUntil)}</p>
+                            </div>
+                          )}
+                          
+                          <div className="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                            <p className="text-[8px] font-black uppercase text-slate-400 mb-1">Bookings</p>
+                            <p className="text-lg font-black text-indigo-600">
+                              {tripStats.confirmedFlights + tripStats.bookedStays + tripStats.bookedTransit}/
+                              {tripStats.totalFlights + tripStats.totalStays + tripStats.totalTransit}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100">
+                          <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Breakdown</p>
                         
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100">
                           <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Breakdown</p>
