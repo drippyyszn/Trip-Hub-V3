@@ -1899,9 +1899,7 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                             </p>
                           </div>
                         </div>
-                        
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100">
-                          <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Breakdown</p>
+                      
                         
                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-sky-100">
                           <p className="text-[8px] font-black uppercase text-slate-400 mb-4">Cost Breakdown</p>
