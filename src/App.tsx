@@ -563,10 +563,11 @@ const StayCard: React.FC<{
 
 const TransitCard: React.FC<{
   transit: Transit;
+  travellers: Traveller[];
   currencySymbol: string;
   onEdit: (id: string, field: string, value: any) => void;
   onDelete: (id: string) => void;
-}> = ({ transit, currencySymbol, onEdit, onDelete }) => {
+}> = ({ transit, travellers, currencySymbol, onEdit, onDelete }) => {
   const Icon = transit.type === 'ferry' ? Ship : transit.type === 'train' ? Train : Bus;
   const [isEditing, setIsEditing] = useState(false);
   const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter') setIsEditing(false); };
@@ -631,7 +632,7 @@ const TransitCard: React.FC<{
                  <input type="time" className="w-full border border-slate-300 bg-white p-2 text-[10px] rounded text-slate-900" value={transit.arrivalTime || ''} onChange={e => onEdit(transit.id, 'arrivalTime', e.target.value)} onKeyDown={handleKeyDown} />
               </div>
             </div>
-            {/* ADD THIS: Price field */}
+            {/* Price field */}
             <div className="space-y-1">
               <label className="text-[8px] font-black uppercase text-slate-400">Price ({currencySymbol})</label>
               <input 
@@ -643,6 +644,29 @@ const TransitCard: React.FC<{
                 onKeyDown={handleKeyDown} 
                 placeholder="0.00"
               />
+            </div>
+            
+            <div className="col-span-2 space-y-2">
+              <label className="text-[8px] font-black uppercase text-slate-400">Travellers on this transit</label>
+              <div className="space-y-2 max-h-32 overflow-y-auto custom-scrollbar">
+                {travellers.map(t => (
+                  <div key={t.id} className="flex items-center gap-3 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                    <input 
+                      type="checkbox" 
+                      checked={(transit.travellerIds || []).includes(t.id)}
+                      onChange={() => {
+                        const current = transit.travellerIds || [];
+                        const updated = current.includes(t.id)
+                          ? current.filter(id => id !== t.id)
+                          : [...current, t.id];
+                        onEdit(transit.id, 'travellerIds', updated);
+                      }}
+                      className="w-4 h-4 rounded bg-white border-slate-300 checked:bg-emerald-500"
+                    />
+                    <span className="text-[10px] font-bold text-slate-700">{t.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
             
             <div className="text-center text-[9px] text-slate-400 italic">Press Enter to save</div>
@@ -1655,7 +1679,7 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                         </div>
                       </div>
                       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                        {activeTrip.transit?.filter(ts => transitFilter === 'all' || ts.type === transitFilter).map(ts => <TransitCard key={ts.id} transit={ts} currencySymbol={currencySymbol} onEdit={handleEditLocal} onDelete={(id) => handleDeleteItem('transit', id)} />)}
+                        {activeTrip.transit?.filter(ts => transitFilter === 'all' || ts.type === transitFilter).map(ts => <TransitCard key={ts.id} transit={ts} travellers={activeTrip.travellers} currencySymbol={currencySymbol} onEdit={handleEditLocal} onDelete={(id) => handleDeleteItem('transit', id)} />)}
                       </div>
                     </section>
                   </div>
