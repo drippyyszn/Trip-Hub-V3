@@ -1843,16 +1843,15 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                               const tripCurrency = activeTrip.preferredCurrency || 'CAD';
                               let travellerCost = 0;
                               
-                              // Add flight costs for flights this traveller is on
+                             // Add flight costs for flights this traveller is on (cost is per person, not split)
                               activeTrip.flights?.forEach(flight => {
                                 if (flight.cost && flight.travellerIds && flight.travellerIds.includes(traveller.id)) {
                                   const convertedCost = convertCurrency(flight.cost, flight.currency || tripCurrency, tripCurrency);
-                                  const sharePerPerson = convertedCost / Math.max(1, flight.travellerIds.length);
-                                  travellerCost += sharePerPerson;
+                                  travellerCost += convertedCost; // Full cost per person
                                 }
                               });
                               
-                              // Add accommodation costs for stays this traveller is on
+                              // Add accommodation costs for stays this traveller is on (split among travellers)
                               activeTrip.accommodations?.forEach(stay => {
                                 if (stay.cost && stay.travellerIds && stay.travellerIds.includes(traveller.id)) {
                                   const convertedCost = convertCurrency(stay.cost, stay.currency || tripCurrency, tripCurrency);
@@ -1861,12 +1860,11 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                                 }
                               });
                               
-                              // Add transit costs for transit this traveller is on
+                              // Add transit costs for transit this traveller is on (cost is per person, not split)
                               activeTrip.transit?.forEach(transit => {
                                 if (transit.cost && transit.travellerIds && transit.travellerIds.includes(traveller.id)) {
                                   const convertedCost = convertCurrency(transit.cost, transit.currency || tripCurrency, tripCurrency);
-                                  const sharePerPerson = convertedCost / Math.max(1, transit.travellerIds.length);
-                                  travellerCost += sharePerPerson;
+                                  travellerCost += convertedCost; // Full cost per person
                                 }
                               });
                               
