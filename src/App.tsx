@@ -58,7 +58,7 @@ const ADD_TEMPLATES = [
 const AIRPORT_OFFSETS: Record<string, number> = {
   YUL: -4, JFK: -4, YYZ: -4, BOS: -4,
   CDG: 2, LHR: 1, AMS: 2, FRA: 2,
-  HND: 9, NRT: 9, ATH: 3,
+  DUB: 1, NRT: 9, ATH: 3,
   LAX: -7, SFO: -7, YVR: -7
 };
 
@@ -85,6 +85,7 @@ const FLIGHT_ESTIMATES: Record<string, number> = {
   'YUL-MAN': 375, 'MAN-YUL': 400, // Manchester
   'YUL-BER': 465, 'BER-YUL': 490, // Berlin
   'YUL-VIE': 495, 'VIE-YUL': 520, // Vienna
+  'DUB-ATH': 244
 };
 
 const formatTime12h = (timeStr?: string) => {
