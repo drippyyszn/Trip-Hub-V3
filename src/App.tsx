@@ -1455,43 +1455,47 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
   const details = `${f.airline || 'Flight'} | ${f.flightNumber || 'TBD'}`;
 
   const est = computeEstimatedArrival(f);
-  const landingTime = f.arrivalTime || est?.arrivalTimeDisplay; // ✅ fallback to calculated time
+  const landingTime = f.arrivalTime || est?.arrivalTimeDisplay;
   const landingDate = f.arrivalDate || est?.arrivalDate || f.departureDate || '';
 
   // Departure event
   timeline.push({
     id: `${f.id}-dep`,
+    parentId: f.id,
     date: f.departureDate || '',
     title: `Flight: ${origin} → ${dest}`,
     type: 'flight',
     details,
     time: f.departureTime,
-    category: 'travel'
+    category: 'travel',
+    isCompleted: (f as any).isCompleted || false
   });
 
   // Landing event
   if (landingDate || landingTime) {
     timeline.push({
       id: `${f.id}-arr`,
+      parentId: f.id,
       date: landingDate,
       title: `Landing: ${dest}`,
       type: 'flight',
       details,
-      time: landingTime, // ✅ will show even if you never typed arrivalTime
-      category: 'travel'
+      time: landingTime,
+      category: 'travel',
+      isCompleted: (f as any).isCompleted || false
     });
   }
 });
     (activeTrip.accommodations || []).forEach(a => {
-      if (a.checkInDate) timeline.push({ id: (a.id as string) + '-in', date: a.checkInDate, title: `Check-in: ${a.name}`, type: 'stay', details: a.address, time: a.checkInTime || '15:00', category: 'rest' });
-      if (a.checkOutDate) timeline.push({ id: (a.id as string) + '-out', date: a.checkOutDate, title: `Check-out: ${a.name}`, type: 'stay', details: a.address, time: a.checkOutTime || '11:00', category: 'rest' });
+      if (a.checkInDate) timeline.push({ id: (a.id as string) + '-in', parentId: a.id, date: a.checkInDate, title: `Check-in: ${a.name}`, type: 'stay', details: a.address, time: a.checkInTime || '15:00', category: 'rest', isCompleted: (a as any).isCompleted || false });
+      if (a.checkOutDate) timeline.push({ id: (a.id as string) + '-out', parentId: a.id, date: a.checkOutDate, title: `Check-out: ${a.name}`, type: 'stay', details: a.address, time: a.checkOutTime || '11:00', category: 'rest', isCompleted: (a as any).isCompleted || false });
     });
     (activeTrip.transit || []).forEach(ts => {
       const from = ts.from || 'TBD';
       const to = ts.to || 'TBD';
-      timeline.push({ id: ts.id, date: ts.departureDate || '', title: `${ts.type.toUpperCase()}: ${from} → ${to}`, type: 'transit', transitType: ts.type, details: ts.operator, time: ts.departureTime, category: 'travel' });
+      timeline.push({ id: ts.id, parentId: ts.id, date: ts.departureDate || '', title: `${ts.type.toUpperCase()}: ${from} → ${to}`, type: 'transit', transitType: ts.type, details: ts.operator, time: ts.departureTime, category: 'travel', isCompleted: (ts as any).isCompleted || false });
     });
-    (activeTrip.itinerary || []).forEach(day => (day.items || []).forEach(it => timeline.push({ ...it, date: it.date || day.date, type: 'activity' })));
+    (activeTrip.itinerary || []).forEach(day => (day.items || []).forEach(it => timeline.push({ ...it, parentId: it.id, date: it.date || day.date, type: 'activity' })));
     return timeline.sort((a, b) => getSortValue(a).localeCompare(getSortValue(b)));
   }, [activeTrip]);
 
@@ -1837,8 +1841,31 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
                               {item.notes && <p className="text-[10px] text-slate-400 mt-1 italic opacity-60">“{item.notes}”</p>}
                             </div>
                             <div className="flex flex-col items-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => handleEditLocal(item.id, 'isCompleted', !item.isCompleted)} className={`p-2 rounded-xl transition-all ${item.isCompleted ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500'}`}><Check className="w-4 h-4"/></button>
-                              <button onClick={() => handleDeleteItem('activity', item.id)} className="p-2 bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 rounded-xl transition-all"><Trash2 className="w-4 h-4"/></button>
+                              <button 
+                                onClick={() => {
+                                  const parentId = item.parentId || item.id;
+                                  handleEditLocal(parentId, 'isCompleted', !item.isCompleted);
+                                }} 
+                                className={`p-2 rounded-xl transition-all ${item.isCompleted ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400 hover:bg-emerald-50 hover:text-emerald-500'}`}
+                              >
+                                <Check className="w-4 h-4"/>
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  if (item.type === 'activity') {
+                                    handleDeleteItem('activity', item.id);
+                                  } else if (item.type === 'flight') {
+                                    handleDeleteItem('flight', item.parentId || item.id);
+                                  } else if (item.type === 'stay') {
+                                    handleDeleteItem('accommodation', item.parentId || item.id);
+                                  } else if (item.type === 'transit') {
+                                    handleDeleteItem('transit', item.id);
+                                  }
+                                }} 
+                                className="p-2 bg-slate-100 text-slate-400 hover:bg-rose-50 hover:text-rose-500 rounded-xl transition-all"
+                              >
+                                <Trash2 className="w-4 h-4"/>
+                              </button>
                             </div>
                           </div>
                         </div>))}
