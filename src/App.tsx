@@ -337,12 +337,20 @@ const FlightCard: React.FC<{
                 <input className="bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded w-24" value={flight.flightNumber} onChange={e => onEdit(flight.id, 'flightNumber', e.target.value)} onKeyDown={handleKeyDown} />
               </div>
             </div>
-            <div className="space-y-1">
-              <label className="text-[8px] font-black uppercase text-slate-400">From</label>
-              <input className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded" value={flight.departureAirport} onChange={e => onEdit(flight.id, 'departureAirport', e.target.value)} onKeyDown={handleKeyDown} />
+            <div className="col-span-2 space-y-1">
+              <label className="text-[8px] font-black uppercase text-slate-400">From City</label>
+              <input className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded" value={flight.departureCity || ''} onChange={e => onEdit(flight.id, 'departureCity', e.target.value)} onKeyDown={handleKeyDown} placeholder="Montreal" />
             </div>
             <div className="space-y-1">
-              <label className="text-[8px] font-black uppercase text-slate-400">To</label>
+              <label className="text-[8px] font-black uppercase text-slate-400">From Airport</label>
+              <input className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded" value={flight.departureAirport} onChange={e => onEdit(flight.id, 'departureAirport', e.target.value)} onKeyDown={handleKeyDown} />
+            </div>
+            <div className="col-span-2 space-y-1">
+              <label className="text-[8px] font-black uppercase text-slate-400">To City</label>
+              <input className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded" value={flight.arrivalCity || ''} onChange={e => onEdit(flight.id, 'arrivalCity', e.target.value)} onKeyDown={handleKeyDown} placeholder="Valencia" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[8px] font-black uppercase text-slate-400">To Airport</label>
               <input className="w-full bg-slate-900 border border-slate-700 text-white p-2 text-[10px] rounded" value={flight.arrivalAirport} onChange={e => onEdit(flight.id, 'arrivalAirport', e.target.value)} onKeyDown={handleKeyDown} />
             </div>
             <div className="space-y-1">
