@@ -1148,7 +1148,6 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
     }
   };
 
-  const handleManualAdd = (type: string, data: any) => {
 
   const handleManualAdd = (type: string, data: any) => {
     if (!activeTripId) return;
