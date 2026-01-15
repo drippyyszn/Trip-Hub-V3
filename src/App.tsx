@@ -979,6 +979,8 @@ const App: React.FC = () => {
   const [showExamples, setShowExamples] = useState(false);
   const [isChatCollapsed, setIsChatCollapsed] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [isLookingUpFlight, setIsLookingUpFlight] = useState(false);
+  const [flightLookupData, setFlightLookupData] = useState<any>(null);
 
   const activeTrip = useMemo(() => trips.find(t => t.id === activeTripId) || null, [trips, activeTripId]);
   const currencySymbol = useMemo(() => CURRENCIES.find(c => c.code === (activeTrip?.preferredCurrency || 'CAD'))?.symbol || '$', [activeTrip]);
