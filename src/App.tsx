@@ -89,7 +89,8 @@ const FLIGHT_ESTIMATES: Record<string, number> = {
   'DUB-ATH': 244,
   'MRS-MXP': 75, 'MXP-MRS': 75, // Marseille to Milan
   'MRS-VLC': 90, 'VLC-MRS': 90, // Marseille to Valencia
-  'VLC-LIS': 90, 'LIS-VLC': 90  // Valencia to Lisbon
+  'VLC-LIS': 90, 'LIS-VLC': 90,  // Valencia to Lisbon
+  'LIS-MRS': 135
 };
 
 const formatTime12h = (timeStr?: string) => {
