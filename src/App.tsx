@@ -1130,7 +1130,25 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
           arrivalAirport: flight.arrival.iata,
           arrivalCity: extractCity(flight.arrival.airport),
           departureTime: flight.departure.scheduled?.split('T')[1]?.substring(0, 5) || '',
-          arrivalTime: flight.arrival.scheduled?.split('T')[1]?.s
+          arrivalTime: flight.arrival.scheduled?.split('T')[1]?.substring(0, 5) || '',
+          departureDate: flight.departure.scheduled?.split('T')[0] || date,
+          arrivalDate: flight.arrival.scheduled?.split('T')[0] || date,
+          airline: flight.airline.name,
+          flightNumber: flightNumber,
+          terminal: flight.departure.terminal,
+          gate: flight.departure.gate,
+        };
+      }
+      return null;
+    } catch (error) {
+      console.error('Flight lookup failed:', error);
+      return null;
+    } finally {
+      setIsLookingUpFlight(false);
+    }
+  };
+
+  const handleManualAdd = (type: string, data: any) => {
 
   const handleManualAdd = (type: string, data: any) => {
     if (!activeTripId) return;
