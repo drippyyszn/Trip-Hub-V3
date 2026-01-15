@@ -1099,6 +1099,39 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
     } : t));
   }, [activeTripId]);
 
+  const lookupFlight = async (airline: string, flightNumber: string, date: string) => {
+    if (!airline || !flightNumber || !date) return null;
+    
+    setIsLookingUpFlight(true);
+    try {
+      // Format: IATA code (e.g., "AC" for Air Canada) + flight number
+      const flightIata = `${airline}${flightNumber}`;
+      
+      const response = await fetch(
+        `http://api.aviationstack.com/v1/flights?access_key=${AVIATIONSTACK_API_KEY}&flight_iata=${flightIata}&flight_date=${date}`
+      );
+      
+      const data = await response.json();
+      
+      if (data.data && data.data.length > 0) {
+        const flight = data.data[0];
+        
+        // Extract city name from airport name (e.g., "Montreal Pierre Elliott Trudeau" -> "Montreal")
+        const extractCity = (airportName: string) => {
+          if (!airportName) return '';
+          // Take first word(s) before common airport terms
+          const cityMatch = airportName.match(/^([^-]+?)(?:\s+(?:International|Airport|Intl|Municipal|Regional|Metropolitan))?/i);
+          return cityMatch ? cityMatch[1].trim() : airportName.split(' ')[0];
+        };
+        
+        return {
+          departureAirport: flight.departure.iata,
+          departureCity: extractCity(flight.departure.airport),
+          arrivalAirport: flight.arrival.iata,
+          arrivalCity: extractCity(flight.arrival.airport),
+          departureTime: flight.departure.scheduled?.split('T')[1]?.substring(0, 5) || '',
+          arrivalTime: flight.arrival.scheduled?.split('T')[1]?.s
+
   const handleManualAdd = (type: string, data: any) => {
     if (!activeTripId) return;
     setTrips(prev => prev.map(t => {
@@ -2086,8 +2119,16 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
           <div className="grid grid-cols-2 gap-3">
             <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">Airline</label><input name="airline" placeholder="e.g. Delta" className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
             <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">Flight #</label><input name="flightNumber" placeholder="DL123" className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
-            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">From (Airport)</label><input name="departureAirport" placeholder="JFK" className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
-            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">To (Airport)</label><input name="arrivalAirport" placeholder="LHR" className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
+            <div className="col-span-1 space-y-1">
+              <label className="text-[8px] font-black uppercase text-slate-400">From City</label>
+              <input name="departureCity" placeholder="Montreal" value={flightLookupData?.departureCity || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, departureCity: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" />
+            </div>
+            <div className="col-span-1 space-y-1">
+              <label className="text-[8px] font-black uppercase text-slate-400">To City</label>
+              <input name="arrivalCity" placeholder="Valencia" value={flightLookupData?.arrivalCity || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, arrivalCity: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" />
+            </div>
+            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">From (Airport)</label><input name="departureAirport" placeholder="YUL" value={flightLookupData?.departureAirport || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, departureAirport: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
+            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">To (Airport)</label><input name="arrivalAirport" placeholder="VLC" value={flightLookupData?.arrivalAirport || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, arrivalAirport: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
             <div className="col-span-1 space-y-1">
               <label className="text-[8px] font-black uppercase text-slate-400">Dep Date</label>
               <input type="date" name="departureDate" className="w-full border p-2 rounded text-xs text-slate-900 bg-white" required />
