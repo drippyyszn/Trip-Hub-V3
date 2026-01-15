@@ -86,7 +86,7 @@ const FLIGHT_ESTIMATES: Record<string, number> = {
   'YUL-MAN': 375, 'MAN-YUL': 400, // Manchester
   'YUL-BER': 465, 'BER-YUL': 490, // Berlin
   'YUL-VIE': 495, 'VIE-YUL': 520, // Vienna
-  'DUB-ATH': 244
+  'DUB-ATH': 244,
   'MRS-MXP': 75, 'MXP-MRS': 75, // Marseille to Milan
   'MRS-VLC': 90, 'VLC-MRS': 90, // Marseille to Valencia
   'VLC-LIS': 90, 'LIS-VLC': 90  // Valencia to Lisbon
