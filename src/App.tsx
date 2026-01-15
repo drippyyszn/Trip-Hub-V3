@@ -87,6 +87,9 @@ const FLIGHT_ESTIMATES: Record<string, number> = {
   'YUL-BER': 465, 'BER-YUL': 490, // Berlin
   'YUL-VIE': 495, 'VIE-YUL': 520, // Vienna
   'DUB-ATH': 244
+  'MRS-MXP': 75, 'MXP-MRS': 75, // Marseille to Milan
+  'MRS-VLC': 90, 'VLC-MRS': 90, // Marseille to Valencia
+  'VLC-LIS': 90, 'LIS-VLC': 90  // Valencia to Lisbon
 };
 
 const formatTime12h = (timeStr?: string) => {
@@ -2149,14 +2152,14 @@ const handleCopyTrip = async (e: React.MouseEvent, tripId: string) => {
             <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">Flight #</label><input name="flightNumber" placeholder="DL123" className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
             <div className="col-span-1 space-y-1">
               <label className="text-[8px] font-black uppercase text-slate-400">From City</label>
-              <input name="departureCity" placeholder="Montreal" value={flightLookupData?.departureCity || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, departureCity: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" />
+              <input name="departureCity" placeholder="Montreal" defaultValue={flightLookupData?.departureCity || ''} key={flightLookupData?.departureCity} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" />
             </div>
             <div className="col-span-1 space-y-1">
               <label className="text-[8px] font-black uppercase text-slate-400">To City</label>
-              <input name="arrivalCity" placeholder="Valencia" value={flightLookupData?.arrivalCity || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, arrivalCity: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" />
+              <input name="arrivalCity" placeholder="Valencia" defaultValue={flightLookupData?.arrivalCity || ''} key={flightLookupData?.arrivalCity} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" />
             </div>
-            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">From (Airport)</label><input name="departureAirport" placeholder="YUL" value={flightLookupData?.departureAirport || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, departureAirport: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
-            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">To (Airport)</label><input name="arrivalAirport" placeholder="VLC" value={flightLookupData?.arrivalAirport || ''} onChange={e => setFlightLookupData((prev: any) => prev ? {...prev, arrivalAirport: e.target.value} : null)} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
+            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">From (Airport)</label><input name="departureAirport" placeholder="YUL" defaultValue={flightLookupData?.departureAirport || ''} key={flightLookupData?.departureAirport} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
+            <div className="col-span-1 space-y-1"><label className="text-[8px] font-black uppercase text-slate-400">To (Airport)</label><input name="arrivalAirport" placeholder="VLC" defaultValue={flightLookupData?.arrivalAirport || ''} key={flightLookupData?.arrivalAirport} className="w-full border p-2 rounded text-xs outline-none focus:border-sky-500 text-slate-900 bg-white" required /></div>
             <div className="col-span-1 space-y-1">
               <label className="text-[8px] font-black uppercase text-slate-400">Dep Date</label>
               <input type="date" name="departureDate" className="w-full border p-2 rounded text-xs text-slate-900 bg-white" required />
